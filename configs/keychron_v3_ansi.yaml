@@ -1,0 +1,21 @@
+# Конфигурация kbd-flag для Keychron V3
+# Глобальный цвет клавиатуры в зависимости от раскладки
+
+device:
+  vendor_id: 0x3434
+  product_id: 0x0331
+  usage_page: 0xFF60
+  usage: 0x61
+
+colors:
+  # Русская раскладка - красный
+  - layout: ru
+    color: {r: 255, g: 0, b: 0}
+
+  # Английская раскладка - синий
+  - layout: us
+    color: {r: 0, g: 0, b: 255}
+
+  # Fallback - белый
+  - layout: "*"
+    color: {r: 255, g: 255, b: 255}

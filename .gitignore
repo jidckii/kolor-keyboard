@@ -1,0 +1,19 @@
+/.claude
+
+# Binary
+kbd-flag
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Go
+vendor/
+
+# Local config
+*.local.yaml
