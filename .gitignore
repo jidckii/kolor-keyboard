@@ -17,3 +17,6 @@ vendor/
 
 # Local config
 *.local.yaml
+
+# claude
+PROGRESS.md
