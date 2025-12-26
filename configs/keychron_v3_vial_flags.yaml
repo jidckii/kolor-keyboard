@@ -51,21 +51,23 @@ flags:
       - leds: [33, 34, 35, 36, 37, 38, 39]  # Row 2: Tab, Q-Y
         color: {r: 0, g: 50, b: 180}
 
-      # Белые полосы (начинаются справа от canton + целые ряды)
+      # Красные полосы (начинаются справа от canton + целые ряды)
       - leds: [7, 8, 9, 10, 11, 12, 13, 14, 15]         # Row 0 right: F7-Light
-        color: {r: 255, g: 255, b: 255}
-      - leds: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49]  # Row 2 right: U-PgDn
-        color: {r: 255, g: 255, b: 255}
-      - rows: [4]  # Row 4 full: LShift-Up (LED 63-75)
-        color: {r: 255, g: 255, b: 255}
-
-      # Красные полосы
+        color: {r: 255, g: 0, b: 0}
       - leds: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32]  # Row 1 right: 7-PgUp
         color: {r: 255, g: 0, b: 0}
-      - rows: [3]  # Row 3 full: Caps-Enter (LED 50-62)
+      - leds: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49]  # Row 2 right: U-PgDn
         color: {r: 255, g: 0, b: 0}
+      - rows: [4]  # Row 4 full: LShift-Up (LED 63-75)
+        color: { r: 255, g: 0, b: 0 }
       - rows: [5]  # Row 5 full: LCtrl-Right (LED 76-86)
-        color: {r: 255, g: 0, b: 0}
+        color: { r: 255, g: 0, b: 0 }
+
+      # Белые полосы
+      - leds: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49]  # Row 2 right: U-PgDn
+        color: {r: 255, g: 255, b: 255}
+      - rows: [3]  # Row 3 full: Caps-Enter (LED 50-62)
+        color: {r: 255, g: 255, b: 255}
 
   # Fallback - зелёный
   - layout: "*"
