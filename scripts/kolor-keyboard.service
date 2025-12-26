@@ -1,12 +1,12 @@
 [Unit]
 Description=Keyboard Layout Flag Indicator
-Documentation=https://github.com/jidckii/kde-keyboard-flag-qmk
+Documentation=https://github.com/jidckii/kolor-keyboard
 After=graphical-session.target dbus.service
 Wants=dbus.service
 
 [Service]
 Type=simple
-ExecStart=%h/.local/bin/kbd-flag --config %h/.config/kbd-flag/config.yaml
+ExecStart=%h/.local/bin/kolor-keyboard --config %h/.config/kolor-keyboard/config.yaml
 Restart=on-failure
 RestartSec=5
 
