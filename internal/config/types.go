@@ -1,9 +1,24 @@
 package config
 
+// Mode - режим работы
+type Mode string
+
+const (
+	ModeMono  Mode = "mono"  // Глобальный цвет для всех клавиш
+	ModeFlags Mode = "flags" // Per-key RGB с флагами
+)
+
 // Config - корневая структура конфигурации
 type Config struct {
-	Device DeviceConfig   `yaml:"device"`
-	Colors []ColorMapping `yaml:"colors"`
+	Device DeviceConfig `yaml:"device"`
+	Mode   Mode         `yaml:"mode"`
+
+	// Для mono режима - один цвет на всю клавиатуру
+	Colors []ColorMapping `yaml:"colors,omitempty"`
+
+	// Для flags режима - per-key RGB
+	Keyboard KeyboardConfig `yaml:"keyboard,omitempty"`
+	Flags    []FlagMapping  `yaml:"flags,omitempty"`
 }
 
 // DeviceConfig - параметры HID устройства
@@ -14,15 +29,36 @@ type DeviceConfig struct {
 	Usage     uint16 `yaml:"usage"`
 }
 
-// ColorMapping - маппинг раскладки на цвет
+// ColorMapping - маппинг раскладки на цвет (для mono режима)
 type ColorMapping struct {
 	Layout string   `yaml:"layout"`
 	Color  RGBColor `yaml:"color"`
 }
 
-// RGBColor - цвет в RGB
+// RGBColor - цвет в RGB формате
 type RGBColor struct {
 	R uint8 `yaml:"r"`
 	G uint8 `yaml:"g"`
 	B uint8 `yaml:"b"`
+}
+
+// KeyboardConfig - конфигурация рядов клавиатуры для flags режима
+type KeyboardConfig struct {
+	// Rows - LED индексы для каждого ряда клавиатуры
+	// Пример: [[0,1,2,3,...], [15,16,17,...], ...]
+	Rows [][]int `yaml:"rows"`
+}
+
+// FlagMapping - маппинг раскладки на флаг (для flags режима)
+type FlagMapping struct {
+	Layout  string       `yaml:"layout"`
+	Stripes []FlagStripe `yaml:"stripes"`
+}
+
+// FlagStripe - горизонтальная полоса флага
+type FlagStripe struct {
+	// Rows - какие ряды клавиатуры занимает эта полоса (0-indexed)
+	Rows []int `yaml:"rows"`
+	// Color - цвет полосы
+	Color RGBColor `yaml:"color"`
 }

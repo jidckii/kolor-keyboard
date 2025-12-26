@@ -8,25 +8,22 @@ import (
 	"github.com/sstallion/go-hid"
 )
 
-// RGBController - интерфейс управления RGB
-type RGBController interface {
-	Open() error
-	Close() error
-	SetColor(color HSVColor) error
-	SetColorRGB(r, g, b uint8) error
-	SetEffect(effect uint8) error
-	SetBrightness(brightness uint8) error
+// LEDUpdate - обновление одного LED
+type LEDUpdate struct {
+	Index int
+	Color HSVColor
 }
 
-// VIARGBDevice реализует RGBController для VIA клавиатур
+// VIARGBDevice реализует управление RGB для VIA клавиатур
 type VIARGBDevice struct {
 	vendorID  uint16
 	productID uint16
 	usagePage uint16
 	usage     uint16
 
-	device *hid.Device
-	mu     sync.Mutex
+	device   *hid.Device
+	mu       sync.Mutex
+	ledCount int
 }
 
 // NewVIARGBDevice создаёт новое устройство
@@ -99,9 +96,27 @@ func (d *VIARGBDevice) write(packet []byte) error {
 
 	// Читаем ответ (VIA требует это)
 	response := make([]byte, PacketSize)
-	_, err = d.device.ReadWithTimeout(response, 100*time.Millisecond)
-	// Игнорируем ошибку таймаута
+	_, _ = d.device.ReadWithTimeout(response, 100*time.Millisecond)
 	return nil
+}
+
+// writeWithResponse отправляет пакет и возвращает ответ
+func (d *VIARGBDevice) writeWithResponse(packet []byte) ([]byte, error) {
+	if d.device == nil {
+		return nil, fmt.Errorf("device not opened")
+	}
+
+	_, err := d.device.Write(packet)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make([]byte, PacketSize)
+	_, err = d.device.ReadWithTimeout(response, 100*time.Millisecond)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
 }
 
 // SetColor устанавливает глобальный цвет (HSV)
@@ -140,4 +155,89 @@ func (d *VIARGBDevice) SetBrightness(brightness uint8) error {
 // EnableSolidColor включает режим solid color
 func (d *VIARGBDevice) EnableSolidColor() error {
 	return d.SetEffect(EffectSolidColor)
+}
+
+// EnableVialDirectMode включает режим прямого управления LED через Vial RGB
+// Это нужно для per-key RGB. Использует команду 0x41 (vialrgb_set_mode)
+func (d *VIARGBDevice) EnableVialDirectMode() error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	// mode=1 (VIALRGB_EFFECT_DIRECT), speed=128, HSV=0,255,255
+	packet := BuildVialSetModePacket(VialEffectDirect, 128, 0, 255, 255)
+	return d.write(packet)
+}
+
+// GetLEDCount возвращает количество LED
+func (d *VIARGBDevice) GetLEDCount() (int, error) {
+	if d.ledCount > 0 {
+		return d.ledCount, nil
+	}
+
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	packet := BuildGetLEDCountPacket()
+	response, err := d.writeWithResponse(packet)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get LED count: %w", err)
+	}
+
+	d.ledCount = ParseLEDCountResponse(response)
+	return d.ledCount, nil
+}
+
+// SetLEDs устанавливает цвета для группы LED (per-key RGB)
+func (d *VIARGBDevice) SetLEDs(updates []LEDUpdate) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	// Группируем последовательные LED для оптимальной отправки
+	for i := 0; i < len(updates); i += MaxLEDsPerPacket {
+		end := i + MaxLEDsPerPacket
+		if end > len(updates) {
+			end = len(updates)
+		}
+
+		batch := updates[i:end]
+		if len(batch) == 0 {
+			continue
+		}
+
+		// Конвертируем в формат для пакета
+		colors := make([]HSVColor, len(batch))
+		startIndex := batch[0].Index
+
+		for j, u := range batch {
+			colors[j] = u.Color
+		}
+
+		packet := BuildDirectSetPacket(startIndex, colors)
+		if err := d.write(packet); err != nil {
+			return fmt.Errorf("failed to set LEDs at index %d: %w", startIndex, err)
+		}
+
+		// Небольшая задержка между пакетами
+		time.Sleep(1 * time.Millisecond)
+	}
+
+	return nil
+}
+
+// SetAllLEDs устанавливает один цвет для всех LED
+func (d *VIARGBDevice) SetAllLEDs(color HSVColor, ledCount int) error {
+	updates := make([]LEDUpdate, ledCount)
+	for i := 0; i < ledCount; i++ {
+		updates[i] = LEDUpdate{Index: i, Color: color}
+	}
+	return d.SetLEDs(updates)
+}
+
+// SetLEDsByIndices устанавливает цвет для указанных индексов LED
+func (d *VIARGBDevice) SetLEDsByIndices(indices []int, color HSVColor) error {
+	updates := make([]LEDUpdate, len(indices))
+	for i, idx := range indices {
+		updates[i] = LEDUpdate{Index: idx, Color: color}
+	}
+	return d.SetLEDs(updates)
 }

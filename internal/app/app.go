@@ -35,6 +35,8 @@ func New(configPath string, logger *slog.Logger) (*App, error) {
 		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
 
+	logger.Info("loaded config", "mode", cfg.Mode)
+
 	// Инициализация D-Bus watcher
 	watcher, err := dbus.NewKDELayoutWatcher()
 	if err != nil {
@@ -82,10 +84,9 @@ func (a *App) Run() error {
 	}
 	defer a.device.Close()
 
-	// Включаем режим solid color
-	a.logger.Info("enabling solid color mode")
-	if err := a.device.EnableSolidColor(); err != nil {
-		a.logger.Warn("failed to enable solid color mode", "error", err)
+	// Инициализация режима в зависимости от конфигурации
+	if err := a.initializeMode(); err != nil {
+		return fmt.Errorf("failed to initialize mode: %w", err)
 	}
 
 	// Установка начального состояния
@@ -128,8 +129,45 @@ func (a *App) Run() error {
 	}
 }
 
-// applyLayout применяет цвет для указанной раскладки
+// initializeMode инициализирует режим RGB
+func (a *App) initializeMode() error {
+	switch a.cfg.Mode {
+	case config.ModeMono:
+		a.logger.Info("enabling solid color mode")
+		if err := a.device.EnableSolidColor(); err != nil {
+			a.logger.Warn("failed to enable solid color mode", "error", err)
+		}
+	case config.ModeFlags:
+		a.logger.Info("enabling Vial direct mode for per-key RGB")
+		// Получаем количество LED для информации
+		ledCount, err := a.device.GetLEDCount()
+		if err != nil {
+			a.logger.Warn("failed to get LED count", "error", err)
+		} else {
+			a.logger.Info("detected LED count", "count", ledCount)
+		}
+		// Включаем Vial Direct режим
+		if err := a.device.EnableVialDirectMode(); err != nil {
+			return fmt.Errorf("failed to enable Vial direct mode: %w", err)
+		}
+	}
+	return nil
+}
+
+// applyLayout применяет цвет/флаг для указанной раскладки
 func (a *App) applyLayout(layout string) error {
+	switch a.cfg.Mode {
+	case config.ModeMono:
+		return a.applyMonoLayout(layout)
+	case config.ModeFlags:
+		return a.applyFlagLayout(layout)
+	default:
+		return fmt.Errorf("unknown mode: %s", a.cfg.Mode)
+	}
+}
+
+// applyMonoLayout применяет глобальный цвет для раскладки
+func (a *App) applyMonoLayout(layout string) error {
 	color := a.cfg.GetColorForLayout(layout)
 	if color == nil {
 		a.logger.Warn("no color configured for layout", "layout", layout)
@@ -140,7 +178,52 @@ func (a *App) applyLayout(layout string) error {
 		return fmt.Errorf("failed to set color: %w", err)
 	}
 
-	a.logger.Debug("applied color", "layout", layout, "r", color.R, "g", color.G, "b", color.B)
+	a.logger.Debug("applied mono color", "layout", layout, "r", color.R, "g", color.G, "b", color.B)
+	return nil
+}
+
+// applyFlagLayout применяет флаг (per-key RGB) для раскладки
+func (a *App) applyFlagLayout(layout string) error {
+	flag := a.cfg.GetFlagForLayout(layout)
+	if flag == nil {
+		a.logger.Warn("no flag configured for layout", "layout", layout)
+		return nil
+	}
+
+	// Каждый раз включаем Vial Direct режим (на случай если пользователь переключил режим)
+	if err := a.device.EnableVialDirectMode(); err != nil {
+		a.logger.Warn("failed to re-enable Vial direct mode", "error", err)
+	}
+
+	// Собираем все LED обновления для флага
+	var updates []hid.LEDUpdate
+
+	for _, stripe := range flag.Stripes {
+		hsvColor := hid.RGBToHSV(stripe.Color.R, stripe.Color.G, stripe.Color.B)
+
+		// Получаем LED для каждого ряда в полосе
+		for _, rowIdx := range stripe.Rows {
+			ledIndices := a.cfg.GetLEDsForRow(rowIdx)
+			for _, ledIdx := range ledIndices {
+				updates = append(updates, hid.LEDUpdate{
+					Index: ledIdx,
+					Color: hsvColor,
+				})
+			}
+		}
+	}
+
+	if len(updates) == 0 {
+		a.logger.Warn("no LED updates for flag", "layout", layout)
+		return nil
+	}
+
+	a.logger.Debug("applying flag", "layout", layout, "led_count", len(updates))
+
+	if err := a.device.SetLEDs(updates); err != nil {
+		return fmt.Errorf("failed to set LEDs: %w", err)
+	}
+
 	return nil
 }
 

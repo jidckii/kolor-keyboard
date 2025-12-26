@@ -4,13 +4,18 @@
 
 Утилита на Go для индикации раскладки клавиатуры через RGB подсветку Keychron V3.
 
+Поддерживает два режима:
+- **Mono** — глобальный цвет для всей клавиатуры (работает со стоковой прошивкой)
+- **Flags** — per-key RGB для отрисовки флагов (требует прошивку Vial)
+
 ---
 
 ## Что работает
 
 - Отслеживание смены раскладки через KDE D-Bus
 - Изменение глобального цвета клавиатуры через VIA RGB Matrix протокол
-- Конфигурация цветов для разных раскладок
+- Per-key RGB управление для отрисовки флагов (с прошивкой Vial)
+- Конфигурация цветов/флагов для разных раскладок
 
 ## Структура проекта
 
@@ -25,10 +30,13 @@ kbd-flag/
 │   │   └── keyboard.go            # KDE D-Bus watcher
 │   ├── hid/
 │   │   ├── device.go              # HID устройство
-│   │   └── protocol.go            # VIA RGB Matrix протокол
+│   │   └── protocol.go            # VIA/Vial RGB протокол
 │   └── app/app.go                 # Главное приложение
 ├── configs/
-│   └── keychron_v3_ansi.yaml      # Конфигурация
+│   ├── keychron_v3_mono.yaml      # Конфиг для глобального цвета
+│   └── keychron_v3_flags.yaml     # Конфиг для per-key RGB флагов
+├── docs/
+│   └── FIRMWARE.md                # Инструкция по прошивке Vial
 ├── scripts/
 │   └── kbd-flag.service           # systemd unit
 ├── go.mod
@@ -41,14 +49,19 @@ kbd-flag/
 # Сборка
 go build -o kbd-flag ./cmd/kbd-flag
 
-# Запуск
-./kbd-flag -config configs/keychron_v3_ansi.yaml
+# Запуск с глобальным цветом (работает со стоковой прошивкой)
+./kbd-flag -config configs/keychron_v3_mono.yaml
+
+# Запуск с флагами (требует прошивку Vial)
+./kbd-flag -config configs/keychron_v3_flags.yaml
 
 # С отладкой
-./kbd-flag -debug -config configs/keychron_v3_ansi.yaml
+./kbd-flag -debug -config configs/keychron_v3_flags.yaml
 ```
 
 ## Конфигурация
+
+### Режим Mono (глобальный цвет)
 
 ```yaml
 device:
@@ -57,6 +70,8 @@ device:
   usage_page: 0xFF60
   usage: 0x61
 
+mode: mono
+
 colors:
   - layout: ru
     color: {r: 255, g: 0, b: 0}    # Красный
@@ -64,6 +79,40 @@ colors:
     color: {r: 0, g: 0, b: 255}    # Синий
   - layout: "*"
     color: {r: 255, g: 255, b: 255} # Белый (fallback)
+```
+
+### Режим Flags (per-key RGB)
+
+```yaml
+device:
+  vendor_id: 0x3434
+  product_id: 0x0331
+  usage_page: 0xFF60
+  usage: 0x61
+
+mode: flags
+
+keyboard:
+  rows:
+    - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]     # Row 0
+    - [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]  # Row 1
+    # ... остальные ряды
+
+flags:
+  # Флаг России: Белый / Синий / Красный
+  - layout: ru
+    stripes:
+      - rows: [0, 1]
+        color: {r: 255, g: 255, b: 255}  # Белый
+      - rows: [2, 3]
+        color: {r: 0, g: 0, b: 255}      # Синий
+      - rows: [4, 5]
+        color: {r: 255, g: 0, b: 0}      # Красный
+
+  - layout: us
+    stripes:
+      - rows: [0, 1, 2, 3, 4, 5]
+        color: {r: 0, g: 50, b: 255}     # Синий
 ```
 
 ## Зависимости
@@ -82,20 +131,32 @@ sudo zypper install systemd-devel
 sudo apt install libudev-dev
 ```
 
-## VIA RGB Matrix протокол
+## Протоколы
 
-Keychron V3 поддерживает стандартный VIA RGB Matrix:
+### VIA RGB Matrix (глобальный цвет)
 
 ```
-# Set effect (1 = solid color)
+# Set effect (2 = solid color)
 0x07, 0x03, 0x02, effect
 
 # Set color (hue, saturation)
 0x07, 0x03, 0x04, hue, sat
 ```
 
-**Важно:** Vial RGB (0x42 для индивидуальных LED) НЕ поддерживается.
-Работает только глобальный цвет.
+### Vial RGB (per-key RGB)
+
+Требует прошивку Vial! См. [docs/FIRMWARE.md](docs/FIRMWARE.md)
+
+```
+# Enable Direct Control mode (effect 1)
+0x07, 0x03, 0x02, 0x01
+
+# Set LEDs directly
+0x07, 0x42, start_lo, start_hi, count, H, S, V, ...
+
+# Get LED count
+0x08, 0x43
+```
 
 ## Установка как systemd service
 
@@ -103,9 +164,11 @@ Keychron V3 поддерживает стандартный VIA RGB Matrix:
 # Скопировать бинарник
 sudo cp kbd-flag /usr/local/bin/
 
-# Скопировать конфиг
+# Скопировать конфиг (выберите один)
 mkdir -p ~/.config/kbd-flag
-cp configs/keychron_v3_ansi.yaml ~/.config/kbd-flag/config.yaml
+cp configs/keychron_v3_flags.yaml ~/.config/kbd-flag/config.yaml
+# или
+cp configs/keychron_v3_mono.yaml ~/.config/kbd-flag/config.yaml
 
 # Скопировать и включить service
 cp scripts/kbd-flag.service ~/.config/systemd/user/
@@ -115,7 +178,7 @@ systemctl --user start kbd-flag
 
 ## Известные ограничения
 
-1. **Только глобальный цвет** — нельзя раскрасить отдельные клавиши (Vial RGB не поддерживается прошивкой)
+1. **Per-key RGB требует прошивку Vial** — стоковая прошивка поддерживает только глобальный цвет
 2. **Только прямое подключение** — через USB-хаб может не работать
 3. **Только KDE Plasma** — используется KDE D-Bus API
 
@@ -130,24 +193,8 @@ systemctl --user start kbd-flag
 - [ ] Горячая перезагрузка конфигурации (SIGHUP)
 - [ ] Tray иконка с текущей раскладкой
 
-### Per-key RGB (флаги на клавиатуре)
-
-Текущая прошивка Keychron V3 **не поддерживает** per-key RGB control через HID.
-Keychron Launcher управляет только предустановленными эффектами и глобальным цветом.
-
-Чтобы раскрашивать отдельные клавиши разными цветами, нужно прошить QMK с Vial.
-
-**Подробная инструкция:** [docs/FIRMWARE.md](docs/FIRMWARE.md)
-
-После прошивки Vial станут доступны команды:
-```
-0x07, 0x42, start_lo, start_hi, count, H, S, V, ...  # Direct LED control
-0x08, 0x43                                            # Get LED count
-```
-
 ### Другие клавиатуры
-
-- [ ] Поддержка других VIA-совместимых клавиатур
+- [ ] Поддержка других VIA/Vial-совместимых клавиатур
 - [ ] Поддержка Razer через OpenRazer
 - [ ] Поддержка Logitech через libratbag
 - [ ] Поддержка SteelSeries через rivalcfg
