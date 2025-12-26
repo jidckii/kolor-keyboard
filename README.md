@@ -2,6 +2,15 @@
 
 Утилита на Go для индикации раскладки клавиатуры через RGB подсветку.
 
+<p align="center">
+  <img src="img/example_mono.gif" alt="Режим Mono" width="45%">
+  <img src="img/example_flag.gif" alt="Режим Flags" width="45%">
+</p>
+<p align="center">
+  <b>Mono</b> — глобальный цвет &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <b>Draw</b> — per-key RGB (флаги, рисунки)
+</p>
+
 > ⚠️ **Дисклеймер**
 >
 > Этот проект полностью сгенерирован с помощью [Claude Code](https://claude.com/claude-code).
