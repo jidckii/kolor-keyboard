@@ -1,4 +1,4 @@
-# kbd-flag: Индикация раскладки через RGB
+# kolor-keyboard: Индикация раскладки через RGB
 
 ## Статус: РАБОТАЕТ
 
@@ -27,8 +27,8 @@
 ## Структура проекта
 
 ```
-kbd-flag/
-├── cmd/kbd-flag/main.go           # Точка входа
+kolor-keyboard/
+├── cmd/kolor-keyboard/main.go           # Точка входа
 ├── internal/
 │   ├── config/
 │   │   ├── config.go              # Загрузка конфига
@@ -46,7 +46,7 @@ kbd-flag/
 ├── docs/
 │   └── FIRMWARE.md                # Инструкция по прошивке Vial
 ├── scripts/
-│   └── kbd-flag.service           # systemd unit
+│   └── kolor-keyboard.service           # systemd unit
 ├── go.mod
 └── Makefile
 ```
@@ -55,19 +55,19 @@ kbd-flag/
 
 ```bash
 # Сборка
-go build -o kbd-flag ./cmd/kbd-flag
+go build -o kolor-keyboard ./cmd/kolor-keyboard
 
 # Stock прошивка: глобальный цвет
-./kbd-flag -config configs/keychron_v3_stock_mono.yaml
+./kolor-keyboard -config configs/keychron_v3_stock_mono.yaml
 
 # Vial прошивка: глобальный цвет
-./kbd-flag -config configs/keychron_v3_vial_mono.yaml
+./kolor-keyboard -config configs/keychron_v3_vial_mono.yaml
 
 # Vial прошивка: флаги стран (per-key RGB)
-./kbd-flag -config configs/keychron_v3_vial_flags.yaml
+./kolor-keyboard -config configs/keychron_v3_vial_flags.yaml
 
 # С отладкой
-./kbd-flag -debug -config configs/keychron_v3_vial_flags.yaml
+./kolor-keyboard -debug -config configs/keychron_v3_vial_flags.yaml
 ```
 
 ## Конфигурация
@@ -187,24 +187,24 @@ sudo apt install libudev-dev
 
 ```bash
 # Скопировать бинарник
-sudo cp kbd-flag /usr/local/bin/
+sudo cp kolor-keyboard /usr/local/bin/
 
 # Скопировать конфиг (выберите подходящий для вашей прошивки)
-mkdir -p ~/.config/kbd-flag
+mkdir -p ~/.config/kolor-keyboard
 
 # Для Stock прошивки (глобальный цвет):
-cp configs/keychron_v3_stock_mono.yaml ~/.config/kbd-flag/config.yaml
+cp configs/keychron_v3_stock_mono.yaml ~/.config/kolor-keyboard/config.yaml
 
 # Для Vial прошивки (флаги):
-cp configs/keychron_v3_vial_flags.yaml ~/.config/kbd-flag/config.yaml
+cp configs/keychron_v3_vial_flags.yaml ~/.config/kolor-keyboard/config.yaml
 
 # Для Vial прошивки (глобальный цвет):
-cp configs/keychron_v3_vial_mono.yaml ~/.config/kbd-flag/config.yaml
+cp configs/keychron_v3_vial_mono.yaml ~/.config/kolor-keyboard/config.yaml
 
 # Скопировать и включить service
-cp scripts/kbd-flag.service ~/.config/systemd/user/
-systemctl --user enable kbd-flag
-systemctl --user start kbd-flag
+cp scripts/kolor-keyboard.service ~/.config/systemd/user/
+systemctl --user enable kolor-keyboard
+systemctl --user start kolor-keyboard
 ```
 
 ## Известные ограничения

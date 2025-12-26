@@ -1,16 +1,16 @@
 .PHONY: build install uninstall clean enable disable status test
 
-BINARY := kbd-flag
+BINARY := kolor-keyboard
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "none")
 LDFLAGS := -ldflags "-X main.version=$(VERSION) -X main.commit=$(COMMIT)"
 
 PREFIX := $(HOME)/.local
-CONFIG_DIR := $(HOME)/.config/kbd-flag
+CONFIG_DIR := $(HOME)/.config/kolor-keyboard
 SYSTEMD_USER_DIR := $(HOME)/.config/systemd/user
 
 build:
-	go build $(LDFLAGS) -o $(BINARY) ./cmd/kbd-flag
+	go build $(LDFLAGS) -o $(BINARY) ./cmd/kolor-keyboard
 
 install: build
 	@echo "Installing $(BINARY)..."
@@ -25,7 +25,7 @@ install: build
 	fi
 	@echo "Installing systemd service..."
 	mkdir -p $(SYSTEMD_USER_DIR)
-	install -Dm644 scripts/kbd-flag.service $(SYSTEMD_USER_DIR)/kbd-flag.service
+	install -Dm644 scripts/kolor-keyboard.service $(SYSTEMD_USER_DIR)/kolor-keyboard.service
 	systemctl --user daemon-reload
 	@echo ""
 	@echo "Installation complete!"
@@ -33,24 +33,24 @@ install: build
 	@echo "  make enable"
 
 enable:
-	systemctl --user enable kbd-flag.service
-	systemctl --user start kbd-flag.service
+	systemctl --user enable kolor-keyboard.service
+	systemctl --user start kolor-keyboard.service
 	@echo "Service enabled and started"
 
 disable:
-	systemctl --user stop kbd-flag.service || true
-	systemctl --user disable kbd-flag.service || true
+	systemctl --user stop kolor-keyboard.service || true
+	systemctl --user disable kolor-keyboard.service || true
 	@echo "Service disabled"
 
 status:
-	systemctl --user status kbd-flag.service
+	systemctl --user status kolor-keyboard.service
 
 logs:
-	journalctl --user -u kbd-flag.service -f
+	journalctl --user -u kolor-keyboard.service -f
 
 uninstall: disable
 	rm -f $(PREFIX)/bin/$(BINARY)
-	rm -f $(SYSTEMD_USER_DIR)/kbd-flag.service
+	rm -f $(SYSTEMD_USER_DIR)/kolor-keyboard.service
 	systemctl --user daemon-reload
 	@echo "Uninstalled. Config left at $(CONFIG_DIR)"
 
