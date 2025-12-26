@@ -195,6 +195,21 @@ func (a *App) applyFlagLayout(layout string) error {
 		a.logger.Warn("failed to re-enable Vial direct mode", "error", err)
 	}
 
+	// Сначала гасим все LED чтобы не было артефактов от предыдущего флага
+	ledCount, err := a.device.GetLEDCount()
+	if err != nil {
+		a.logger.Warn("failed to get LED count for clearing", "error", err)
+		ledCount = 87 // fallback для Keychron V3
+	}
+
+	clearUpdates := make([]hid.LEDUpdate, ledCount)
+	for i := 0; i < ledCount; i++ {
+		clearUpdates[i] = hid.LEDUpdate{Index: i, Color: hid.HSVColor{H: 0, S: 0, V: 0}}
+	}
+	if err := a.device.SetLEDs(clearUpdates); err != nil {
+		a.logger.Warn("failed to clear LEDs", "error", err)
+	}
+
 	// Собираем все LED обновления для флага
 	var updates []hid.LEDUpdate
 
