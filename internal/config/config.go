@@ -50,18 +50,18 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("unknown firmware: %s (expected 'stock' or 'vial')", c.Firmware)
 	}
 
-	// flags режим доступен только для vial
-	if c.Mode == ModeFlags && c.Firmware == FirmwareStock {
-		return fmt.Errorf("flags mode requires vial firmware (stock firmware only supports mono mode)")
+	// draw режим доступен только для vial
+	if c.Mode == ModeDraw && c.Firmware == FirmwareStock {
+		return fmt.Errorf("draw mode requires vial firmware (stock firmware only supports mono mode)")
 	}
 
 	switch c.Mode {
 	case ModeMono:
 		return c.validateMono()
-	case ModeFlags:
-		return c.validateFlags()
+	case ModeDraw:
+		return c.validateDraw()
 	default:
-		return fmt.Errorf("unknown mode: %s (expected 'mono' or 'flags')", c.Mode)
+		return fmt.Errorf("unknown mode: %s (expected 'mono' or 'draw')", c.Mode)
 	}
 }
 
@@ -72,18 +72,18 @@ func (c *Config) validateMono() error {
 	return nil
 }
 
-func (c *Config) validateFlags() error {
+func (c *Config) validateDraw() error {
 	if len(c.Keyboard.Rows) == 0 {
-		return fmt.Errorf("keyboard.rows is required for flags mode")
+		return fmt.Errorf("keyboard.rows is required for draw mode")
 	}
 
-	if len(c.Flags) == 0 {
-		return fmt.Errorf("at least one flag mapping is required for flags mode")
+	if len(c.Drawings) == 0 {
+		return fmt.Errorf("at least one drawing mapping is required for draw mode")
 	}
 
 	// Проверяем что все stripes ссылаются на существующие ряды
 	numRows := len(c.Keyboard.Rows)
-	for i, flag := range c.Flags {
+	for i, flag := range c.Drawings {
 		if len(flag.Stripes) == 0 {
 			return fmt.Errorf("flag[%d] (%s): at least one stripe is required", i, flag.Layout)
 		}
@@ -116,17 +116,17 @@ func (c *Config) GetColorForLayout(layout string) *RGBColor {
 	return nil
 }
 
-// GetFlagForLayout возвращает флаг для указанной раскладки (flags mode)
+// GetFlagForLayout возвращает флаг для указанной раскладки (draw mode)
 func (c *Config) GetFlagForLayout(layout string) *FlagMapping {
-	for i := range c.Flags {
-		if c.Flags[i].Layout == layout {
-			return &c.Flags[i]
+	for i := range c.Drawings {
+		if c.Drawings[i].Layout == layout {
+			return &c.Drawings[i]
 		}
 	}
 	// Fallback на wildcard
-	for i := range c.Flags {
-		if c.Flags[i].Layout == "*" {
-			return &c.Flags[i]
+	for i := range c.Drawings {
+		if c.Drawings[i].Layout == "*" {
+			return &c.Drawings[i]
 		}
 	}
 	return nil

@@ -4,7 +4,7 @@
 
 <p align="center">
   <img src="img/example_mono.gif" alt="Режим Mono" width="45%">
-  <img src="img/example_flag.gif" alt="Режим Flags" width="45%">
+  <img src="img/example_flag.gif" alt="Режим Draw" width="45%">
 </p>
 <p align="center">
   <b>Mono</b> — глобальный цвет &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -23,16 +23,24 @@
 |------------|-----------|---------|--------|
 | Keychron V3 | ANSI | ✅ | Протестировано |
 
+## Поддерживаемые платформы
+
+| ОС | DE | Статус |
+|----|-----|--------|
+| Linux | KDE Plasma 6 | Протестировано (openSUSE Tumbleweed) |
+| Linux | KDE Plasma 5 | Должно работать |
+| Linux | GNOME, Sway и др. | Не поддерживается (планируется) |
+
 ## Поддерживаемые прошивки
 
-| Прошивка | Режим Mono | Режим Flags |
-|----------|------------|-------------|
+| Прошивка | Режим Mono | Режим Draw |
+|----------|------------|------------|
 | **Stock** (QMK/VIA) | ✅ | ❌ |
 | **Vial** | ✅ | ✅ |
 
 ### Режимы работы:
 - **Mono** — глобальный цвет для всей клавиатуры
-- **Flags** — per-key RGB для отрисовки флагов стран (только Vial)
+- **Draw** — per-key RGB для отрисовки флагов стран (только Vial)
 
 ---
 
@@ -96,7 +104,7 @@ go build -o kolor-keyboard ./cmd/kolor-keyboard
 | Поле | Значения | Описание |
 |------|----------|----------|
 | `firmware` | `stock`, `vial` | Тип прошивки (по умолчанию: `vial`) |
-| `mode` | `mono`, `flags` | Режим работы (по умолчанию: `mono`) |
+| `mode` | `mono`, `draw` | Режим работы (по умолчанию: `mono`) |
 
 ### Stock + Mono (глобальный цвет, стоковая прошивка)
 
@@ -119,7 +127,7 @@ colors:
     color: {r: 255, g: 255, b: 255} # Белый (fallback)
 ```
 
-### Vial + Flags (per-key RGB флаги, прошивка Vial)
+### Vial + Draw (per-key RGB флаги, прошивка Vial)
 
 ```yaml
 device:
@@ -129,7 +137,7 @@ device:
   usage: 0x61
 
 firmware: vial
-mode: flags
+mode: draw
 
 keyboard:
   rows:
@@ -137,7 +145,7 @@ keyboard:
     - [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]  # Row 1
     # ... остальные ряды (см. docs/LED_MAP.md)
 
-flags:
+draw:
   # Флаг России: Белый / Синий / Красный (горизонтальные полосы)
   - layout: ru
     stripes:

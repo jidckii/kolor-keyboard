@@ -1,4 +1,4 @@
-# Конфигурация kolor-keyboard для Keychron V3 - VIAL прошивка, режим FLAGS (per-key RGB)
+# Конфигурация kolor-keyboard для Keychron V3 - VIAL прошивка, режим DRAW (per-key RGB)
 # Рисует флаги стран на клавиатуре
 # Требует прошивку Vial (см. docs/FIRMWARE.md)
 
@@ -9,7 +9,7 @@ device:
   usage: 0x61
 
 firmware: vial
-mode: flags
+mode: draw
 
 # Раскладка LED для Keychron V3 ANSI Encoder (87 LEDs)
 # Индексы LED для каждого ряда клавиатуры
@@ -28,7 +28,7 @@ keyboard:
     # Row 5: Ctrl, Win, Alt, Space, Alt, Fn, Ctrl, Left, Down, Right (11 LEDs: 76-86)
     - [76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86]
 
-flags:
+draw:
   # Флаг России: Белый / Синий / Красный (горизонтальные полосы)
   - layout: ru
     stripes:

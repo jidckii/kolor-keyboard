@@ -164,7 +164,7 @@ func (a *App) applyLayout(layout string) error {
 	switch a.cfg.Mode {
 	case config.ModeMono:
 		return a.applyMonoLayout(layout)
-	case config.ModeFlags:
+	case config.ModeDraw:
 		return a.applyFlagLayout(layout)
 	default:
 		return fmt.Errorf("unknown mode: %s", a.cfg.Mode)

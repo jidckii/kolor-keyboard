@@ -23,7 +23,7 @@ const (
 	EffectDisable    = 0x00
 	EffectSolidColor = 0x02
 
-	// Vial RGB эффекты (для flags режима)
+	// Vial RGB эффекты (для draw режима)
 	VialEffectOff    = 0x0000
 	VialEffectDirect = 0x0001
 )
@@ -129,7 +129,7 @@ func BuildSetBrightnessPacket(brightness uint8) []byte {
 	return packet
 }
 
-// BuildVialSetModePacket устанавливает режим Vial RGB (для flags режима)
+// BuildVialSetModePacket устанавливает режим Vial RGB (для draw режима)
 // Формат: [0x07, 0x41, mode_lo, mode_hi, speed, H, S, V]
 func BuildVialSetModePacket(mode uint16, speed, h, s, v uint8) []byte {
 	packet := make([]byte, PacketSize)
