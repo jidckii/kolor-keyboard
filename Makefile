@@ -17,12 +17,8 @@ install: build
 	install -Dm755 $(BINARY) $(PREFIX)/bin/$(BINARY)
 	@echo "Installing config..."
 	mkdir -p $(CONFIG_DIR)
-	@if [ ! -f $(CONFIG_DIR)/config.yaml ]; then \
-		install -Dm644 configs/keychron_v3_ansi.yaml $(CONFIG_DIR)/config.yaml; \
-		echo "Config installed to $(CONFIG_DIR)/config.yaml"; \
-	else \
-		echo "Config already exists, skipping..."; \
-	fi
+	install -Dm644 configs/keychron_v3_vial_draw.yaml $(CONFIG_DIR)/config.yaml
+	@echo "Config installed to $(CONFIG_DIR)/config.yaml"
 	@echo "Installing systemd service..."
 	mkdir -p $(SYSTEMD_USER_DIR)
 	install -Dm644 scripts/kolor-keyboard.service $(SYSTEMD_USER_DIR)/kolor-keyboard.service
@@ -33,13 +29,11 @@ install: build
 	@echo "  make enable"
 
 enable:
-	systemctl --user enable kolor-keyboard.service
-	systemctl --user start kolor-keyboard.service
+	systemctl --user enable --now kolor-keyboard.service
 	@echo "Service enabled and started"
 
 disable:
-	systemctl --user stop kolor-keyboard.service || true
-	systemctl --user disable kolor-keyboard.service || true
+	systemctl --user disable --now kolor-keyboard.service || true
 	@echo "Service disabled"
 
 status:
