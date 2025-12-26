@@ -1,6 +1,6 @@
-# Конфигурация kbd-flag для Keychron V3 - режим MONO
+# Конфигурация kbd-flag для Keychron V3 - STOCK прошивка, режим MONO
 # Глобальный цвет клавиатуры в зависимости от раскладки
-# Работает со стоковой прошивкой и с Vial
+# Работает со стоковой QMK/VIA прошивкой
 
 device:
   vendor_id: 0x3434
@@ -8,6 +8,7 @@ device:
   usage_page: 0xFF60
   usage: 0x61
 
+firmware: stock
 mode: mono
 
 colors:

@@ -8,10 +8,19 @@ const (
 	ModeFlags Mode = "flags" // Per-key RGB с флагами
 )
 
+// Firmware - тип прошивки
+type Firmware string
+
+const (
+	FirmwareStock Firmware = "stock" // Стоковая QMK/VIA прошивка
+	FirmwareVial  Firmware = "vial"  // Vial прошивка
+)
+
 // Config - корневая структура конфигурации
 type Config struct {
-	Device DeviceConfig `yaml:"device"`
-	Mode   Mode         `yaml:"mode"`
+	Device   DeviceConfig `yaml:"device"`
+	Firmware Firmware     `yaml:"firmware"` // stock или vial
+	Mode     Mode         `yaml:"mode"`
 
 	// Для mono режима - один цвет на всю клавиатуру
 	Colors []ColorMapping `yaml:"colors,omitempty"`

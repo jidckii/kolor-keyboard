@@ -1,4 +1,4 @@
-# Конфигурация kbd-flag для Keychron V3 - режим FLAGS (per-key RGB)
+# Конфигурация kbd-flag для Keychron V3 - VIAL прошивка, режим FLAGS (per-key RGB)
 # Рисует флаги стран на клавиатуре
 # Требует прошивку Vial (см. docs/FIRMWARE.md)
 
@@ -8,6 +8,7 @@ device:
   usage_page: 0xFF60
   usage: 0x61
 
+firmware: vial
 mode: flags
 
 # Раскладка LED для Keychron V3 ANSI Encoder (87 LEDs)

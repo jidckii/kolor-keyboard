@@ -131,14 +131,19 @@ func (a *App) Run() error {
 
 // initializeMode инициализирует режим RGB
 func (a *App) initializeMode() error {
-	switch a.cfg.Mode {
-	case config.ModeMono:
-		a.logger.Info("enabling solid color mode")
+	a.logger.Info("initializing", "firmware", a.cfg.Firmware, "mode", a.cfg.Mode)
+
+	switch a.cfg.Firmware {
+	case config.FirmwareStock:
+		// Stock прошивка - только VIA RGB Matrix команды
+		a.logger.Info("using VIA RGB Matrix commands (stock firmware)")
 		if err := a.device.EnableSolidColor(); err != nil {
 			a.logger.Warn("failed to enable solid color mode", "error", err)
 		}
-	case config.ModeFlags:
-		a.logger.Info("enabling Vial direct mode for per-key RGB")
+
+	case config.FirmwareVial:
+		// Vial прошивка - Vial RGB команды
+		a.logger.Info("using Vial RGB commands")
 		// Получаем количество LED для информации
 		ledCount, err := a.device.GetLEDCount()
 		if err != nil {
@@ -174,11 +179,53 @@ func (a *App) applyMonoLayout(layout string) error {
 		return nil
 	}
 
+	switch a.cfg.Firmware {
+	case config.FirmwareStock:
+		return a.applyMonoStock(color)
+	case config.FirmwareVial:
+		return a.applyMonoVial(color)
+	default:
+		return fmt.Errorf("unknown firmware: %s", a.cfg.Firmware)
+	}
+}
+
+// applyMonoStock применяет цвет через VIA RGB Matrix (stock прошивка)
+func (a *App) applyMonoStock(color *config.RGBColor) error {
+	// Используем VIA RGB Matrix команды
 	if err := a.device.SetColorRGB(color.R, color.G, color.B); err != nil {
 		return fmt.Errorf("failed to set color: %w", err)
 	}
 
-	a.logger.Debug("applied mono color", "layout", layout, "r", color.R, "g", color.G, "b", color.B)
+	a.logger.Debug("applied mono color (stock)", "r", color.R, "g", color.G, "b", color.B)
+	return nil
+}
+
+// applyMonoVial применяет цвет через Vial Direct режим (vial прошивка)
+func (a *App) applyMonoVial(color *config.RGBColor) error {
+	// Включаем Vial Direct режим
+	if err := a.device.EnableVialDirectMode(); err != nil {
+		a.logger.Warn("failed to enable Vial direct mode", "error", err)
+	}
+
+	// Получаем количество LED
+	ledCount, err := a.device.GetLEDCount()
+	if err != nil {
+		a.logger.Warn("failed to get LED count", "error", err)
+		ledCount = 87 // fallback
+	}
+
+	// Все LED одного цвета
+	hsvColor := hid.RGBToHSV(color.R, color.G, color.B)
+	updates := make([]hid.LEDUpdate, ledCount)
+	for i := 0; i < ledCount; i++ {
+		updates[i] = hid.LEDUpdate{Index: i, Color: hsvColor}
+	}
+
+	if err := a.device.SetLEDs(updates); err != nil {
+		return fmt.Errorf("failed to set LEDs: %w", err)
+	}
+
+	a.logger.Debug("applied mono color (vial)", "r", color.R, "g", color.G, "b", color.B)
 	return nil
 }
 

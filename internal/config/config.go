@@ -19,6 +19,11 @@ func Load(path string) (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config: %w", err)
 	}
 
+	// Если firmware не указан, используем vial
+	if cfg.Firmware == "" {
+		cfg.Firmware = FirmwareVial
+	}
+
 	// Если mode не указан, используем mono
 	if cfg.Mode == "" {
 		cfg.Mode = ModeMono
@@ -35,6 +40,19 @@ func Load(path string) (*Config, error) {
 func (c *Config) Validate() error {
 	if c.Device.VendorID == 0 || c.Device.ProductID == 0 {
 		return fmt.Errorf("device vendor_id and product_id are required")
+	}
+
+	// Проверяем firmware
+	switch c.Firmware {
+	case FirmwareStock, FirmwareVial:
+		// ok
+	default:
+		return fmt.Errorf("unknown firmware: %s (expected 'stock' or 'vial')", c.Firmware)
+	}
+
+	// flags режим доступен только для vial
+	if c.Mode == ModeFlags && c.Firmware == FirmwareStock {
+		return fmt.Errorf("flags mode requires vial firmware (stock firmware only supports mono mode)")
 	}
 
 	switch c.Mode {

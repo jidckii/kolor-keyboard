@@ -4,17 +4,24 @@
 
 Утилита на Go для индикации раскладки клавиатуры через RGB подсветку Keychron V3.
 
-Поддерживает два режима:
-- **Mono** — глобальный цвет для всей клавиатуры (работает со стоковой прошивкой)
-- **Flags** — per-key RGB для отрисовки флагов (требует прошивку Vial)
+## Поддерживаемые прошивки
+
+| Прошивка | Режим Mono | Режим Flags |
+|----------|------------|-------------|
+| **Stock** (QMK/VIA) | ✅ | ❌ |
+| **Vial** | ✅ | ✅ |
+
+### Режимы работы:
+- **Mono** — глобальный цвет для всей клавиатуры
+- **Flags** — per-key RGB для отрисовки флагов стран (только Vial)
 
 ---
 
 ## Что работает
 
 - Отслеживание смены раскладки через KDE D-Bus
-- Изменение глобального цвета клавиатуры через VIA RGB Matrix протокол
-- Per-key RGB управление для отрисовки флагов (с прошивкой Vial)
+- **Stock прошивка**: изменение глобального цвета через VIA RGB Matrix протокол
+- **Vial прошивка**: per-key RGB управление для отрисовки флагов + mono режим
 - Конфигурация цветов/флагов для разных раскладок
 
 ## Структура проекта
@@ -33,8 +40,9 @@ kbd-flag/
 │   │   └── protocol.go            # VIA/Vial RGB протокол
 │   └── app/app.go                 # Главное приложение
 ├── configs/
-│   ├── keychron_v3_mono.yaml      # Конфиг для глобального цвета
-│   └── keychron_v3_flags.yaml     # Конфиг для per-key RGB флагов
+│   ├── keychron_v3_stock_mono.yaml  # Stock прошивка: глобальный цвет
+│   ├── keychron_v3_vial_mono.yaml   # Vial прошивка: глобальный цвет
+│   └── keychron_v3_vial_flags.yaml  # Vial прошивка: флаги стран
 ├── docs/
 │   └── FIRMWARE.md                # Инструкция по прошивке Vial
 ├── scripts/
@@ -49,19 +57,29 @@ kbd-flag/
 # Сборка
 go build -o kbd-flag ./cmd/kbd-flag
 
-# Запуск с глобальным цветом (работает со стоковой прошивкой)
-./kbd-flag -config configs/keychron_v3_mono.yaml
+# Stock прошивка: глобальный цвет
+./kbd-flag -config configs/keychron_v3_stock_mono.yaml
 
-# Запуск с флагами (требует прошивку Vial)
-./kbd-flag -config configs/keychron_v3_flags.yaml
+# Vial прошивка: глобальный цвет
+./kbd-flag -config configs/keychron_v3_vial_mono.yaml
+
+# Vial прошивка: флаги стран (per-key RGB)
+./kbd-flag -config configs/keychron_v3_vial_flags.yaml
 
 # С отладкой
-./kbd-flag -debug -config configs/keychron_v3_flags.yaml
+./kbd-flag -debug -config configs/keychron_v3_vial_flags.yaml
 ```
 
 ## Конфигурация
 
-### Режим Mono (глобальный цвет)
+### Поля конфигурации
+
+| Поле | Значения | Описание |
+|------|----------|----------|
+| `firmware` | `stock`, `vial` | Тип прошивки (по умолчанию: `vial`) |
+| `mode` | `mono`, `flags` | Режим работы (по умолчанию: `mono`) |
+
+### Stock + Mono (глобальный цвет, стоковая прошивка)
 
 ```yaml
 device:
@@ -70,6 +88,7 @@ device:
   usage_page: 0xFF60
   usage: 0x61
 
+firmware: stock
 mode: mono
 
 colors:
@@ -81,7 +100,7 @@ colors:
     color: {r: 255, g: 255, b: 255} # Белый (fallback)
 ```
 
-### Режим Flags (per-key RGB)
+### Vial + Flags (per-key RGB флаги, прошивка Vial)
 
 ```yaml
 device:
@@ -90,29 +109,35 @@ device:
   usage_page: 0xFF60
   usage: 0x61
 
+firmware: vial
 mode: flags
 
 keyboard:
   rows:
-    - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]     # Row 0
+    - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]           # Row 0
     - [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]  # Row 1
-    # ... остальные ряды
+    # ... остальные ряды (см. docs/LED_MAP.md)
 
 flags:
-  # Флаг России: Белый / Синий / Красный
+  # Флаг России: Белый / Синий / Красный (горизонтальные полосы)
   - layout: ru
     stripes:
       - rows: [0, 1]
         color: {r: 255, g: 255, b: 255}  # Белый
       - rows: [2, 3]
-        color: {r: 0, g: 0, b: 255}      # Синий
+        color: {r: 0, g: 50, b: 255}     # Синий
       - rows: [4, 5]
         color: {r: 255, g: 0, b: 0}      # Красный
 
+  # Флаг США: синий canton + красно-белые полосы
   - layout: us
     stripes:
-      - rows: [0, 1, 2, 3, 4, 5]
-        color: {r: 0, g: 50, b: 255}     # Синий
+      # Синий canton (левый верхний угол)
+      - leds: [0, 1, 2, 3, 4, 5, 6]      # ESC, F1-F6
+        color: {r: 0, g: 50, b: 180}
+      - leds: [16, 17, 18, 19, 20, 21, 22]  # ~, 1-6
+        color: {r: 0, g: 50, b: 180}
+      # ... (белые и красные полосы)
 ```
 
 ## Зависимости
@@ -164,11 +189,17 @@ sudo apt install libudev-dev
 # Скопировать бинарник
 sudo cp kbd-flag /usr/local/bin/
 
-# Скопировать конфиг (выберите один)
+# Скопировать конфиг (выберите подходящий для вашей прошивки)
 mkdir -p ~/.config/kbd-flag
-cp configs/keychron_v3_flags.yaml ~/.config/kbd-flag/config.yaml
-# или
-cp configs/keychron_v3_mono.yaml ~/.config/kbd-flag/config.yaml
+
+# Для Stock прошивки (глобальный цвет):
+cp configs/keychron_v3_stock_mono.yaml ~/.config/kbd-flag/config.yaml
+
+# Для Vial прошивки (флаги):
+cp configs/keychron_v3_vial_flags.yaml ~/.config/kbd-flag/config.yaml
+
+# Для Vial прошивки (глобальный цвет):
+cp configs/keychron_v3_vial_mono.yaml ~/.config/kbd-flag/config.yaml
 
 # Скопировать и включить service
 cp scripts/kbd-flag.service ~/.config/systemd/user/
