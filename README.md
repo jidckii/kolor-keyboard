@@ -135,31 +135,9 @@ systemctl --user start kbd-flag
 Текущая прошивка Keychron V3 **не поддерживает** per-key RGB control через HID.
 Keychron Launcher управляет только предустановленными эффектами и глобальным цветом.
 
-Чтобы раскрашивать отдельные клавиши разными цветами, нужно прошить QMK с Vial:
+Чтобы раскрашивать отдельные клавиши разными цветами, нужно прошить QMK с Vial.
 
-```bash
-# 1. Установить QMK
-python3 -m pip install qmk
-qmk setup
-
-# 2. Скачать Vial QMK fork
-git clone https://github.com/vial-kb/vial-qmk.git
-cd vial-qmk
-
-# 3. Скомпилировать прошивку для Keychron V3
-qmk compile -kb keychron/v3/ansi/encoder -km vial
-
-# 4. Перевести клавиатуру в DFU режим
-#    (удерживать Esc при подключении USB)
-
-# 5. Прошить
-qmk flash -kb keychron/v3/ansi/encoder -km vial
-```
-
-**Риски:**
-- Можно окирпичить клавиатуру при неправильной прошивке
-- Восстановление через DFU режим (Esc + подключение)
-- Потеря гарантии Keychron
+**Подробная инструкция:** [docs/FIRMWARE.md](docs/FIRMWARE.md)
 
 После прошивки Vial станут доступны команды:
 ```
