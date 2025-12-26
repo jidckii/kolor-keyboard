@@ -14,17 +14,17 @@ mode: flags
 # Индексы LED для каждого ряда клавиатуры
 keyboard:
   rows:
-    # Row 0: ESC, F1-F12, PrintScr, Pause, Delete (16 LEDs)
+    # Row 0: ESC, F1-F12, PrintScr, Pause, Delete (16 LEDs: 0-15)
     - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-    # Row 1: ~, 1-0, -, =, Backspace, Insert, Home, PgUp (17 LEDs)
+    # Row 1: ~, 1-0, -, =, Backspace, Insert, Home, PgUp (17 LEDs: 16-32)
     - [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
-    # Row 2: Tab, Q-P, [, ], \, Delete, End, PgDn (17 LEDs)
+    # Row 2: Tab, Q-P, [, ], \, Delete, End, PgDn (17 LEDs: 33-49)
     - [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
-    # Row 3: Caps, A-L, ;, ', Enter (13 LEDs)
+    # Row 3: Caps, A-L, ;, ', Enter (13 LEDs: 50-62)
     - [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
-    # Row 4: LShift, Z-M, comma, period, /, RShift, Up (13 LEDs)
+    # Row 4: LShift, Z-M, comma, period, /, RShift, Up (13 LEDs: 63-75)
     - [63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75]
-    # Row 5: Ctrl, Win, Alt, Space, Alt, Fn, Ctrl, Left, Down, Right (11 LEDs)
+    # Row 5: Ctrl, Win, Alt, Space, Alt, Fn, Ctrl, Left, Down, Right (11 LEDs: 76-86)
     - [76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86]
 
 flags:
@@ -34,15 +34,34 @@ flags:
       - rows: [0, 1]       # Верхние 2 ряда - белый
         color: {r: 255, g: 255, b: 255}
       - rows: [2, 3]       # Средние 2 ряда - синий
-        color: {r: 0, g: 0, b: 255}
+        color: {r: 0, g: 50, b: 255}
       - rows: [4, 5]       # Нижние 2 ряда - красный
         color: {r: 255, g: 0, b: 0}
 
-  # Флаг США: синий (упрощённый вариант)
+  # Флаг США: синий угол + красно-белые полосы
   - layout: us
     stripes:
-      - rows: [0, 1, 2, 3, 4, 5]  # Вся клавиатура - синий
-        color: {r: 0, g: 50, b: 255}
+      # Синий угол (левая часть рядов 0-2)
+      - leds: [0, 1, 2, 3, 4, 5, 6,           # Row 0: ESC, F1-F6
+               16, 17, 18, 19, 20, 21, 22,    # Row 1: ~, 1-6
+               33, 34, 35, 36, 37, 38, 39]    # Row 2: Tab, Q-Y
+        color: {r: 0, g: 40, b: 180}  # Navy blue
+
+      # Красные полосы
+      - leds: [7, 8, 9, 10, 11, 12, 13, 14, 15]  # Row 0 правая часть
+        color: {r: 255, g: 0, b: 0}
+      - leds: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49]  # Row 2 правая часть
+        color: {r: 255, g: 0, b: 0}
+      - rows: [4]  # Row 4 целиком
+        color: {r: 255, g: 0, b: 0}
+
+      # Белые полосы
+      - leds: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32]  # Row 1 правая часть
+        color: {r: 255, g: 255, b: 255}
+      - rows: [3]  # Row 3 целиком
+        color: {r: 255, g: 255, b: 255}
+      - rows: [5]  # Row 5 целиком
+        color: {r: 255, g: 255, b: 255}
 
   # Fallback - зелёный
   - layout: "*"

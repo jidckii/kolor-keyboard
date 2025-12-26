@@ -201,14 +201,24 @@ func (a *App) applyFlagLayout(layout string) error {
 	for _, stripe := range flag.Stripes {
 		hsvColor := hid.RGBToHSV(stripe.Color.R, stripe.Color.G, stripe.Color.B)
 
-		// Получаем LED для каждого ряда в полосе
-		for _, rowIdx := range stripe.Rows {
-			ledIndices := a.cfg.GetLEDsForRow(rowIdx)
-			for _, ledIdx := range ledIndices {
+		// Если указаны конкретные LED - используем их
+		if len(stripe.LEDs) > 0 {
+			for _, ledIdx := range stripe.LEDs {
 				updates = append(updates, hid.LEDUpdate{
 					Index: ledIdx,
 					Color: hsvColor,
 				})
+			}
+		} else {
+			// Иначе используем ряды
+			for _, rowIdx := range stripe.Rows {
+				ledIndices := a.cfg.GetLEDsForRow(rowIdx)
+				for _, ledIdx := range ledIndices {
+					updates = append(updates, hid.LEDUpdate{
+						Index: ledIdx,
+						Color: hsvColor,
+					})
+				}
 			}
 		}
 	}

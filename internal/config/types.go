@@ -58,7 +58,9 @@ type FlagMapping struct {
 // FlagStripe - горизонтальная полоса флага
 type FlagStripe struct {
 	// Rows - какие ряды клавиатуры занимает эта полоса (0-indexed)
-	Rows []int `yaml:"rows"`
+	Rows []int `yaml:"rows,omitempty"`
+	// LEDs - конкретные индексы LED (альтернатива Rows для сложных флагов)
+	LEDs []int `yaml:"leds,omitempty"`
 	// Color - цвет полосы
 	Color RGBColor `yaml:"color"`
 }
