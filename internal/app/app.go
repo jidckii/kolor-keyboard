@@ -195,52 +195,51 @@ func (a *App) applyFlagLayout(layout string) error {
 		a.logger.Warn("failed to re-enable Vial direct mode", "error", err)
 	}
 
-	// Сначала гасим все LED чтобы не было артефактов от предыдущего флага
+	// Получаем количество LED
 	ledCount, err := a.device.GetLEDCount()
 	if err != nil {
-		a.logger.Warn("failed to get LED count for clearing", "error", err)
+		a.logger.Warn("failed to get LED count", "error", err)
 		ledCount = 87 // fallback для Keychron V3
 	}
 
-	clearUpdates := make([]hid.LEDUpdate, ledCount)
-	for i := 0; i < ledCount; i++ {
-		clearUpdates[i] = hid.LEDUpdate{Index: i, Color: hid.HSVColor{H: 0, S: 0, V: 0}}
-	}
-	if err := a.device.SetLEDs(clearUpdates); err != nil {
-		a.logger.Warn("failed to clear LEDs", "error", err)
+	// Создаём массив для ВСЕХ LED, инициализируем чёрным (выключено)
+	// Это гарантирует что все LED будут обновлены и в правильном порядке
+	ledColors := make([]hid.HSVColor, ledCount)
+	for i := range ledColors {
+		ledColors[i] = hid.HSVColor{H: 0, S: 0, V: 0} // чёрный
 	}
 
-	// Собираем все LED обновления для флага
-	var updates []hid.LEDUpdate
-
+	// Заполняем цветами из конфига флага
 	for _, stripe := range flag.Stripes {
 		hsvColor := hid.RGBToHSV(stripe.Color.R, stripe.Color.G, stripe.Color.B)
 
 		// Если указаны конкретные LED - используем их
 		if len(stripe.LEDs) > 0 {
 			for _, ledIdx := range stripe.LEDs {
-				updates = append(updates, hid.LEDUpdate{
-					Index: ledIdx,
-					Color: hsvColor,
-				})
+				if ledIdx >= 0 && ledIdx < ledCount {
+					ledColors[ledIdx] = hsvColor
+				}
 			}
 		} else {
 			// Иначе используем ряды
 			for _, rowIdx := range stripe.Rows {
 				ledIndices := a.cfg.GetLEDsForRow(rowIdx)
 				for _, ledIdx := range ledIndices {
-					updates = append(updates, hid.LEDUpdate{
-						Index: ledIdx,
-						Color: hsvColor,
-					})
+					if ledIdx >= 0 && ledIdx < ledCount {
+						ledColors[ledIdx] = hsvColor
+					}
 				}
 			}
 		}
 	}
 
-	if len(updates) == 0 {
-		a.logger.Warn("no LED updates for flag", "layout", layout)
-		return nil
+	// Формируем обновления в порядке индексов (0, 1, 2, ..., ledCount-1)
+	updates := make([]hid.LEDUpdate, ledCount)
+	for i := 0; i < ledCount; i++ {
+		updates[i] = hid.LEDUpdate{
+			Index: i,
+			Color: ledColors[i],
+		}
 	}
 
 	a.logger.Debug("applying flag", "layout", layout, "led_count", len(updates))
