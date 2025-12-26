@@ -69,7 +69,7 @@ kolor-keyboard/
 ├── configs/
 │   ├── keychron_v3_stock_mono.yaml  # Stock прошивка: глобальный цвет
 │   ├── keychron_v3_vial_mono.yaml   # Vial прошивка: глобальный цвет
-│   └── keychron_v3_vial_flags.yaml  # Vial прошивка: флаги стран
+│   └── keychron_v3_vial_draw.yaml   # Vial прошивка: флаги стран
 ├── docs/
 │   └── FIRMWARE.md                # Инструкция по прошивке Vial
 ├── scripts/
@@ -91,10 +91,10 @@ go build -o kolor-keyboard ./cmd/kolor-keyboard
 ./kolor-keyboard -config configs/keychron_v3_vial_mono.yaml
 
 # Vial прошивка: флаги стран (per-key RGB)
-./kolor-keyboard -config configs/keychron_v3_vial_flags.yaml
+./kolor-keyboard -config configs/keychron_v3_vial_draw.yaml
 
 # С отладкой
-./kolor-keyboard -debug -config configs/keychron_v3_vial_flags.yaml
+./kolor-keyboard -debug -config configs/keychron_v3_vial_draw.yaml
 ```
 
 ## Конфигурация
@@ -223,7 +223,7 @@ mkdir -p ~/.config/kolor-keyboard
 cp configs/keychron_v3_stock_mono.yaml ~/.config/kolor-keyboard/config.yaml
 
 # Для Vial прошивки (флаги):
-cp configs/keychron_v3_vial_flags.yaml ~/.config/kolor-keyboard/config.yaml
+cp configs/keychron_v3_vial_draw.yaml ~/.config/kolor-keyboard/config.yaml
 
 # Для Vial прошивки (глобальный цвет):
 cp configs/keychron_v3_vial_mono.yaml ~/.config/kolor-keyboard/config.yaml
