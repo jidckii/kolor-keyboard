@@ -1,6 +1,6 @@
 # kolor-keyboard configuration
-# Keychron V3 ANSI Encoder - Stock QMK/VIA firmware, Mono mode
-# Global keyboard color based on layout
+# Generated for: Keychron Keychron V3
+# Keyboard: keychron/v3/ansi_encoder
 
 device:
   vendor_id: 0x3434
@@ -11,14 +11,9 @@ device:
 firmware: stock
 mode: mono
 
+# Global RGB settings
 brightness: 200  # 0-255
 
 colors:
-  - layout: ru
-    color: {rgb: {r: 255, g: 0, b: 0}}
-
-  - layout: us
-    color: {rgb: {r: 0, g: 0, b: 255}}
-
   - layout: "*"
-    color: {rgb: {r: 255, g: 255, b: 255}}
+    color: {rgb: {r: 0, g: 255, b: 0}}

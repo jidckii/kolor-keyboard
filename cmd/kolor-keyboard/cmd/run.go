@@ -23,8 +23,7 @@ The config file is searched in the following order:
   1. Path specified with -c/--config flag
   2. ./kolor-keyboard.yaml (current directory)
   3. ~/.config/kolor-keyboard/config.yaml
-  4. /etc/kolor-keyboard/config.yaml
-  5. Auto-generated configs in ~/.config/kolor-keyboard/keyboards/`,
+  4. Auto-generated configs in ~/.config/kolor-keyboard/keyboards/`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := configPath
 		if cfg == "" {
@@ -35,7 +34,6 @@ The config file is searched in the following order:
 			fmt.Fprintln(os.Stderr, "Config file not found. Searched locations:")
 			fmt.Fprintln(os.Stderr, "  - ./kolor-keyboard.yaml")
 			fmt.Fprintln(os.Stderr, "  - ~/.config/kolor-keyboard/config.yaml")
-			fmt.Fprintln(os.Stderr, "  - /etc/kolor-keyboard/config.yaml")
 			fmt.Fprintln(os.Stderr, "")
 			fmt.Fprintln(os.Stderr, "Tip: Run 'kolor-keyboard discover' to detect your keyboard and generate a config")
 			return fmt.Errorf("config file not found")
@@ -66,7 +64,6 @@ func findConfig() string {
 	paths := []string{
 		"kolor-keyboard.yaml",
 		filepath.Join(home, ".config/kolor-keyboard/config.yaml"),
-		"/etc/kolor-keyboard/config.yaml",
 	}
 
 	for _, p := range paths {
