@@ -8,9 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/jidckii/kde-keyboard-flag-qmk/internal/config"
-	"github.com/jidckii/kde-keyboard-flag-qmk/internal/dbus"
-	"github.com/jidckii/kde-keyboard-flag-qmk/internal/hid"
+	"github.com/jidckii/kolor-keyboard/pkg/config"
+	"github.com/jidckii/kolor-keyboard/pkg/dbus"
+	"github.com/jidckii/kolor-keyboard/pkg/hid"
 )
 
 // App - главное приложение

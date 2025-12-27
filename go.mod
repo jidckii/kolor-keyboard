@@ -1,4 +1,4 @@
-module github.com/jidckii/kde-keyboard-flag-qmk
+module github.com/jidckii/kolor-keyboard
 
 go 1.22
 
