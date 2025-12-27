@@ -12,7 +12,7 @@ firmware: vial
 mode: draw
 
 # Глобальные настройки RGB
-brightness: 200  # 0-255, яркость подсветки
+brightness: 128  # 0-255, яркость подсветки
 speed: 128       # 0-255, скорость эффектов
 
 # Раскладка LED для Keychron V3 ANSI Encoder (87 LEDs)

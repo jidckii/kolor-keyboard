@@ -21,18 +21,20 @@ type VIARGBDevice struct {
 	usagePage uint16
 	usage     uint16
 
-	device   *hid.Device
-	mu       sync.Mutex
-	ledCount int
+	device     *hid.Device
+	mu         sync.Mutex
+	ledCount   int
+	brightness uint8 // глобальная яркость (0-255), применяется к V компоненту
 }
 
 // NewVIARGBDevice создаёт новое устройство
 func NewVIARGBDevice(vendorID, productID, usagePage, usage uint16) *VIARGBDevice {
 	return &VIARGBDevice{
-		vendorID:  vendorID,
-		productID: productID,
-		usagePage: usagePage,
-		usage:     usage,
+		vendorID:   vendorID,
+		productID:  productID,
+		usagePage:  usagePage,
+		usage:      usage,
+		brightness: 255, // максимальная яркость по умолчанию
 	}
 }
 
@@ -144,10 +146,15 @@ func (d *VIARGBDevice) SetEffect(effect uint8) error {
 }
 
 // SetBrightness устанавливает яркость
+// Для stock прошивки - отправляет VIA команду
+// Для vial прошивки - сохраняет значение для применения к V компоненту LED
 func (d *VIARGBDevice) SetBrightness(brightness uint8) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
+	d.brightness = brightness
+
+	// Также отправляем VIA команду (работает для stock прошивки)
 	packet := BuildSetBrightnessPacket(brightness)
 	return d.write(packet)
 }
@@ -209,12 +216,14 @@ func (d *VIARGBDevice) SetLEDs(updates []LEDUpdate) error {
 			continue
 		}
 
-		// Конвертируем в формат для пакета
+		// Конвертируем в формат для пакета с применением яркости
 		colors := make([]HSVColor, len(batch))
 		startIndex := batch[0].Index
 
 		for j, u := range batch {
-			colors[j] = u.Color
+			// Применяем глобальную яркость к V компоненту
+			v := uint16(u.Color.V) * uint16(d.brightness) / 255
+			colors[j] = HSVColor{H: u.Color.H, S: u.Color.S, V: uint8(v)}
 		}
 
 		packet := BuildDirectSetPacket(startIndex, colors)
