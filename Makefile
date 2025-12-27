@@ -1,4 +1,4 @@
-.PHONY: build install uninstall clean enable disable status test
+.PHONY: build install uninstall clean enable disable status test discover coverage-html
 
 BINARY := kolor-keyboard
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
@@ -92,4 +92,8 @@ test-dbus:
 
 # Запуск в режиме отладки
 run-debug: build
-	./$(BINARY) --debug --config configs/keychron_v3_ansi.yaml
+	./$(BINARY) --debug --config configs/keychron_v3_vial_draw.yaml
+
+# Обнаружение клавиатуры и генерация конфига
+discover: build
+	./$(BINARY) --discover
