@@ -15,5 +15,62 @@ mode: mono
 brightness: 200  # 0-255
 
 colors:
+  # Russian - red (flag color)
+  - layout: ru
+    color: {rgb: {r: 255, g: 0, b: 0}}
+
+  # English - blue
+  - layout: us
+    color: {rgb: {r: 0, g: 100, b: 255}}
+
+  # German - gold/yellow (flag color)
+  - layout: de
+    color: {rgb: {r: 255, g: 200, b: 0}}
+
+  # French - blue (flag color)
+  - layout: fr
+    color: {rgb: {r: 0, g: 50, b: 200}}
+
+  # Spanish - orange/red (flag color)
+  - layout: es
+    color: {rgb: {r: 255, g: 100, b: 0}}
+
+  # Italian - green (flag color)
+  - layout: it
+    color: {rgb: {r: 0, g: 200, b: 80}}
+
+  # Ukrainian - blue (flag color)
+  - layout: ua
+    color: {rgb: {r: 0, g: 90, b: 200}}
+
+  # Turkish - red (flag color)
+  - layout: tr
+    color: {rgb: {r: 200, g: 0, b: 0}}
+
+  # Arabic - green (pan-Arab color)
+  - layout: ar
+    color: {rgb: {r: 0, g: 150, b: 50}}
+
+  # Chinese - red (flag color)
+  - layout: cn
+    color: {rgb: {r: 220, g: 0, b: 0}}
+
+  # Japanese - white/red (flag inspired)
+  - layout: jp
+    color: {rgb: {r: 255, g: 100, b: 100}}
+
+  # Korean - blue (flag color)
+  - layout: kr
+    color: {rgb: {r: 0, g: 70, b: 170}}
+
+  # Portuguese - green (flag color)
+  - layout: pt
+    color: {rgb: {r: 0, g: 180, b: 60}}
+
+  # Polish - white (flag color)
+  - layout: pl
+    color: {rgb: {r: 255, g: 255, b: 255}}
+
+  # Fallback - green
   - layout: "*"
     color: {rgb: {r: 0, g: 255, b: 0}}
