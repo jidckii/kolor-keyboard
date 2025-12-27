@@ -1,0 +1,25 @@
+# kolor-keyboard configuration
+# Keychron V3 ANSI Encoder - Vial firmware, Mono mode
+# Global keyboard color based on layout
+
+device:
+  vendor_id: 0x3434
+  product_id: 0x0331
+  usage_page: 0xFF60
+  usage: 0x61
+
+firmware: vial
+mode: mono
+
+brightness: 200  # 0-255
+speed: 128       # 0-255
+
+colors:
+  - layout: ru
+    color: {rgb: {r: 255, g: 0, b: 0}}
+
+  - layout: us
+    color: {hsv: {h: 170, s: 255, v: 255}}
+
+  - layout: "*"
+    color: {rgb: {r: 255, g: 255, b: 255}}

@@ -15,9 +15,9 @@ build:
 install: build
 	@echo "Installing $(BINARY)..."
 	install -Dm755 $(BINARY) $(PREFIX)/bin/$(BINARY)
-	@echo "Installing config..."
+	@echo "Installing example config..."
 	mkdir -p $(CONFIG_DIR)
-	install -Dm644 configs/keychron_v3_vial_draw.yaml $(CONFIG_DIR)/config.yaml
+	install -Dm644 keyboards/keychron/v3/ansi_encoder/vial_draw.yaml $(CONFIG_DIR)/config.yaml
 	@echo "Config installed to $(CONFIG_DIR)/config.yaml"
 	@echo "Installing systemd service..."
 	mkdir -p $(SYSTEMD_USER_DIR)
@@ -62,7 +62,7 @@ coverage-html: test
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report: coverage.html"
 
-# Установка udev rules (требует sudo)
+# Install udev rules (requires sudo)
 install-udev:
 	@echo "Installing udev rules..."
 	sudo wget -O /etc/udev/rules.d/50-qmk.rules \
@@ -74,7 +74,7 @@ install-udev:
 	sudo udevadm trigger
 	@echo "udev rules installed. You may need to replug the keyboard."
 
-# Отладка: показать HID устройства
+# Debug: show HID devices
 list-hid:
 	@echo "Looking for Keychron devices..."
 	@lsusb | grep -i keychron || echo "No Keychron found in lsusb"
@@ -82,7 +82,7 @@ list-hid:
 	@echo "HID devices:"
 	@ls -la /dev/hidraw* 2>/dev/null || echo "No hidraw devices"
 
-# Отладка: тест D-Bus
+# Debug: test D-Bus
 test-dbus:
 	@echo "Testing KDE keyboard D-Bus interface..."
 	qdbus6 org.kde.keyboard /Layouts org.kde.KeyboardLayouts.getLayout
@@ -90,10 +90,10 @@ test-dbus:
 	@echo "Layouts list:"
 	qdbus6 org.kde.keyboard /Layouts org.kde.KeyboardLayouts.getLayoutsList
 
-# Запуск в режиме отладки
+# Run in debug mode
 run-debug: build
-	./$(BINARY) --debug --config configs/keychron_v3_vial_draw.yaml
+	./$(BINARY) run --debug -c keyboards/keychron/v3/ansi_encoder/vial_draw.yaml
 
-# Обнаружение клавиатуры и генерация конфига
+# Discover keyboard and generate config
 discover: build
-	./$(BINARY) --discover
+	./$(BINARY) discover
