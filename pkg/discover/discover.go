@@ -129,12 +129,15 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 	fmt.Println("║                                                              ║")
 	fmt.Println("║  Commands:                                                   ║")
 	fmt.Println("║    Enter/n  - next LED (add to current row)                  ║")
-	fmt.Println("║    r        - finish current row, start new row              ║")
+	fmt.Println("║    r        - end row here (add LED and start new row)       ║")
 	fmt.Println("║    s        - skip this LED (don't add to any row)           ║")
 	fmt.Println("║    b        - go back (undo last LED)                        ║")
 	fmt.Println("║    q        - quit and save                                  ║")
 	fmt.Println("║                                                              ║")
-	fmt.Println("║  Current LED will be RED, previous in row GREEN              ║")
+	fmt.Println("║  Colors:                                                     ║")
+	fmt.Println("║    RED     - current LED                                     ║")
+	fmt.Println("║    GREEN   - current row LEDs                                ║")
+	fmt.Println("║    YELLOW  - saved rows (different shades per row)           ║")
 	fmt.Println("╚══════════════════════════════════════════════════════════════╝")
 	fmt.Println()
 
@@ -154,6 +157,17 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 		// Обновляем дисплей
 		device.EnableVialDirectMode()
 		device.SetLEDs(allOff)
+
+		// Показываем уже сохранённые ряды разными оттенками жёлтого
+		for rowIdx, row := range rows {
+			// Оттенки жёлтого: H=20-40 (оранжево-жёлтый спектр)
+			hue := uint8(20 + (rowIdx%5)*4) // 20, 24, 28, 32, 36, циклично
+			for _, idx := range row {
+				device.SetLEDs([]hid.LEDUpdate{
+					{Index: idx, Color: hid.HSVColor{H: hue, S: 255, V: 200}},
+				})
+			}
+		}
 
 		// Показываем предыдущие LED в текущем ряду зелёным
 		for _, idx := range currentRow {
@@ -186,14 +200,12 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 			return rows, nil
 
 		case "r":
-			// Новый ряд
-			if len(currentRow) > 0 {
-				rows = append(rows, currentRow)
-				fmt.Printf("\n  → Row %d saved: %v (%d LEDs)\n", len(rows)-1, currentRow, len(currentRow))
-				currentRow = []int{}
-			} else {
-				fmt.Println("\n  (current row is empty, nothing to save)")
-			}
+			// Добавить LED к ряду, сохранить ряд и начать новый
+			currentRow = append(currentRow, currentLED)
+			rows = append(rows, currentRow)
+			fmt.Printf("\n  → Row %d saved: %v (%d LEDs)\n", len(rows)-1, currentRow, len(currentRow))
+			currentRow = []int{}
+			currentLED++
 
 		case "s":
 			// Пропустить LED
