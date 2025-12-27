@@ -10,6 +10,7 @@ import (
 
 	"github.com/jidckii/kolor-keyboard/pkg/config"
 	"github.com/jidckii/kolor-keyboard/pkg/dbus"
+	"github.com/jidckii/kolor-keyboard/pkg/discover"
 	"github.com/jidckii/kolor-keyboard/pkg/hid"
 )
 
@@ -43,12 +44,52 @@ func New(configPath string, logger *slog.Logger) (*App, error) {
 		return nil, fmt.Errorf("failed to create layout watcher: %w", err)
 	}
 
-	// Инициализация HID устройства
+	// Определение устройства
+	var vendorID, productID uint16
+	var manufacturer, product string
+
+	if cfg.Device != nil {
+		// Устройство указано явно в конфиге
+		vendorID = cfg.Device.VendorID
+		productID = cfg.Device.ProductID
+		logger.Info("using device from config",
+			"vid", fmt.Sprintf("%04X", vendorID),
+			"pid", fmt.Sprintf("%04X", productID))
+	} else {
+		// Автоопределение устройства
+		devices, err := discover.FindVIADevices()
+		if err != nil {
+			return nil, fmt.Errorf("failed to discover VIA devices: %w", err)
+		}
+		if len(devices) == 0 {
+			return nil, fmt.Errorf("no VIA-compatible keyboards found")
+		}
+
+		// Берём первое найденное устройство
+		dev := devices[0]
+		vendorID = dev.VendorID
+		productID = dev.ProductID
+		manufacturer = dev.Manufacturer
+		product = dev.Product
+
+		logger.Info("auto-detected keyboard",
+			"manufacturer", manufacturer,
+			"product", product,
+			"vid", fmt.Sprintf("%04X", vendorID),
+			"pid", fmt.Sprintf("%04X", productID))
+
+		if len(devices) > 1 {
+			logger.Warn("multiple VIA keyboards found, using first one",
+				"total", len(devices))
+		}
+	}
+
+	// Инициализация HID устройства (usage_page и usage всегда стандартные для VIA)
 	device := hid.NewVIARGBDevice(
-		cfg.Device.VendorID,
-		cfg.Device.ProductID,
-		cfg.Device.UsagePage,
-		cfg.Device.Usage,
+		vendorID,
+		productID,
+		discover.VIAUsagePage,
+		discover.VIAUsage,
 	)
 
 	return &App{
@@ -75,10 +116,6 @@ func (a *App) Run() error {
 	}()
 
 	// Открытие устройства
-	a.logger.Info("opening HID device",
-		"vid", fmt.Sprintf("%04X", a.cfg.Device.VendorID),
-		"pid", fmt.Sprintf("%04X", a.cfg.Device.ProductID))
-
 	if err := a.device.Open(); err != nil {
 		return fmt.Errorf("failed to open device: %w", err)
 	}

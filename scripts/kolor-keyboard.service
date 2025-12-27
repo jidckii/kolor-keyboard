@@ -6,7 +6,7 @@ Wants=dbus.service
 
 [Service]
 Type=simple
-ExecStart=%h/.local/bin/kolor-keyboard --config %h/.config/kolor-keyboard/config.yaml
+ExecStart=%h/.local/bin/kolor-keyboard run
 Restart=on-failure
 RestartSec=5
 

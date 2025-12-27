@@ -26,10 +26,7 @@ func TestGenerateConfig(t *testing.T) {
 				KeyboardRows: [][]int{{0, 1, 2}, {3, 4, 5}},
 			},
 			wantContains: []string{
-				"vendor_id: 0x3434",
-				"product_id: 0x0331",
-				"usage_page: 0xFF60",
-				"usage: 0x61",
+				"# Device: VID=3434 PID=0331", // device info в комментарии
 				"firmware: vial",
 				"mode: draw",
 				"keyboard:",
@@ -74,8 +71,7 @@ func TestGenerateConfig(t *testing.T) {
 				Firmware: "stock",
 			},
 			wantContains: []string{
-				"vendor_id: 0x1234",
-				"product_id: 0x5678",
+				"# Device: VID=1234 PID=5678", // device info в комментарии
 				"firmware: stock",
 				"mode: mono",
 				"colors:",
@@ -116,9 +112,9 @@ func TestGenerateConfigVialWithRows(t *testing.T) {
 		t.Error("Missing header comment")
 	}
 
-	// Check device section
-	if !strings.Contains(config, "device:") {
-		t.Error("Missing device section")
+	// Check device info in comment (not as YAML section)
+	if !strings.Contains(config, "# Device: VID=3434 PID=0331") {
+		t.Error("Missing device info comment")
 	}
 
 	// Check rows are present

@@ -20,9 +20,9 @@ const (
 
 // Config - корневая структура конфигурации
 type Config struct {
-	Device   DeviceConfig `yaml:"device"`
-	Firmware Firmware     `yaml:"firmware"` // stock или vial
-	Mode     Mode         `yaml:"mode"`
+	Device   *DeviceConfig `yaml:"device,omitempty"` // опционально, автоопределение если nil
+	Firmware Firmware      `yaml:"firmware"`         // stock или vial
+	Mode     Mode          `yaml:"mode"`
 
 	// Глобальные настройки RGB
 	Brightness *uint8 `yaml:"brightness,omitempty"` // 0-255 (nil = не менять)

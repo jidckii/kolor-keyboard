@@ -38,8 +38,11 @@ func Load(path string) (*Config, error) {
 
 // Validate проверяет корректность конфигурации
 func (c *Config) Validate() error {
-	if c.Device.VendorID == 0 || c.Device.ProductID == 0 {
-		return fmt.Errorf("device vendor_id and product_id are required")
+	// Device опционален — если указан, проверяем что vendor_id и product_id заданы
+	if c.Device != nil {
+		if c.Device.VendorID == 0 || c.Device.ProductID == 0 {
+			return fmt.Errorf("device vendor_id and product_id are required when device is specified")
+		}
 	}
 
 	// Проверяем firmware

@@ -259,13 +259,7 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 	sb.WriteString("# kolor-keyboard configuration\n")
 	sb.WriteString(fmt.Sprintf("# Generated for: %s %s\n", cfg.Device.Manufacturer, cfg.Device.Product))
 	sb.WriteString(fmt.Sprintf("# Keyboard: %s/%s/%s\n", vendor, model, variant))
-	sb.WriteString("\n")
-
-	sb.WriteString("device:\n")
-	sb.WriteString(fmt.Sprintf("  vendor_id: 0x%04X\n", cfg.Device.VendorID))
-	sb.WriteString(fmt.Sprintf("  product_id: 0x%04X\n", cfg.Device.ProductID))
-	sb.WriteString(fmt.Sprintf("  usage_page: 0x%04X\n", cfg.Device.UsagePage))
-	sb.WriteString(fmt.Sprintf("  usage: 0x%02X\n", cfg.Device.Usage))
+	sb.WriteString(fmt.Sprintf("# Device: VID=%04X PID=%04X\n", cfg.Device.VendorID, cfg.Device.ProductID))
 	sb.WriteString("\n")
 
 	sb.WriteString(fmt.Sprintf("firmware: %s\n", cfg.Firmware))

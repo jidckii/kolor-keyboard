@@ -42,6 +42,9 @@ colors:
 	}
 
 	// Проверяем device
+	if cfg.Device == nil {
+		t.Fatal("Device is nil")
+	}
 	if cfg.Device.VendorID != 0x3434 {
 		t.Errorf("VendorID = %x, want 0x3434", cfg.Device.VendorID)
 	}
@@ -182,7 +185,7 @@ colors:
 			wantErr: false,
 		},
 		{
-			name: "missing device",
+			name: "missing device (auto-detect)",
 			config: `
 firmware: vial
 mode: mono
@@ -190,7 +193,20 @@ colors:
   - layout: "*"
     color: {rgb: {r: 255, g: 0, b: 0}}
 `,
-			wantErr: true,
+			wantErr: false, // device опционален — будет автоопределение
+		},
+		{
+			name: "device with missing vendor_id",
+			config: `
+device:
+  product_id: 0x5678
+firmware: vial
+mode: mono
+colors:
+  - layout: "*"
+    color: {rgb: {r: 255, g: 0, b: 0}}
+`,
+			wantErr: true, // если device указан, vendor_id обязателен
 		},
 		{
 			name: "draw mode with stock firmware",
