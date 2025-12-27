@@ -286,16 +286,91 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 		}
 		sb.WriteString("\n")
 		sb.WriteString("draw:\n")
-		sb.WriteString("  # Example: all rows same color\n")
-		sb.WriteString("  - layout: \"*\"\n")
-		sb.WriteString("    stripes:\n")
 
 		// Генерируем все ряды
-		rowIndices := make([]int, len(cfg.KeyboardRows))
+		rowCount := len(cfg.KeyboardRows)
+		allRows := make([]int, rowCount)
 		for i := range cfg.KeyboardRows {
-			rowIndices[i] = i
+			allRows[i] = i
 		}
-		sb.WriteString(fmt.Sprintf("      - rows: %v\n", rowIndices))
+
+		// Russian tricolor (white/blue/red)
+		sb.WriteString("  # Russian - tricolor flag (white/blue/red)\n")
+		sb.WriteString("  - layout: ru\n")
+		sb.WriteString("    stripes:\n")
+		if rowCount >= 3 {
+			// Distribute rows into 3 stripes
+			third := rowCount / 3
+			whiteRows := allRows[:third]
+			blueRows := allRows[third : third*2]
+			redRows := allRows[third*2:]
+			sb.WriteString(fmt.Sprintf("      - rows: %v\n", whiteRows))
+			sb.WriteString("        color: {rgb: {r: 255, g: 255, b: 255}}  # white\n")
+			sb.WriteString(fmt.Sprintf("      - rows: %v\n", blueRows))
+			sb.WriteString("        color: {rgb: {r: 0, g: 50, b: 255}}    # blue\n")
+			sb.WriteString(fmt.Sprintf("      - rows: %v\n", redRows))
+			sb.WriteString("        color: {rgb: {r: 255, g: 0, b: 0}}      # red\n")
+		} else {
+			sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+			sb.WriteString("        color: {rgb: {r: 255, g: 0, b: 0}}\n")
+		}
+		sb.WriteString("\n")
+
+		// English - blue
+		sb.WriteString("  # English - blue\n")
+		sb.WriteString("  - layout: us\n")
+		sb.WriteString("    stripes:\n")
+		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+		sb.WriteString("        color: {rgb: {r: 0, g: 100, b: 255}}\n")
+		sb.WriteString("\n")
+
+		// German - gold
+		sb.WriteString("  # German - gold/yellow\n")
+		sb.WriteString("  - layout: de\n")
+		sb.WriteString("    stripes:\n")
+		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+		sb.WriteString("        color: {rgb: {r: 255, g: 200, b: 0}}\n")
+		sb.WriteString("\n")
+
+		// French - blue
+		sb.WriteString("  # French - blue\n")
+		sb.WriteString("  - layout: fr\n")
+		sb.WriteString("    stripes:\n")
+		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+		sb.WriteString("        color: {rgb: {r: 0, g: 50, b: 200}}\n")
+		sb.WriteString("\n")
+
+		// Spanish - orange
+		sb.WriteString("  # Spanish - orange\n")
+		sb.WriteString("  - layout: es\n")
+		sb.WriteString("    stripes:\n")
+		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+		sb.WriteString("        color: {rgb: {r: 255, g: 100, b: 0}}\n")
+		sb.WriteString("\n")
+
+		// Ukrainian - blue/yellow flag
+		sb.WriteString("  # Ukrainian - blue/yellow flag\n")
+		sb.WriteString("  - layout: ua\n")
+		sb.WriteString("    stripes:\n")
+		if rowCount >= 2 {
+			half := rowCount / 2
+			blueRows := allRows[:half]
+			yellowRows := allRows[half:]
+			sb.WriteString(fmt.Sprintf("      - rows: %v\n", blueRows))
+			sb.WriteString("        color: {rgb: {r: 0, g: 90, b: 200}}    # blue\n")
+			sb.WriteString(fmt.Sprintf("      - rows: %v\n", yellowRows))
+			sb.WriteString("        color: {rgb: {r: 255, g: 215, b: 0}}   # yellow\n")
+		} else {
+			sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+			sb.WriteString("        color: {rgb: {r: 0, g: 90, b: 200}}\n")
+		}
+		sb.WriteString("\n")
+
+		// Fallback - green
+		sb.WriteString("  # Fallback - green\n")
+		sb.WriteString("  - layout: \"*\"\n")
+		sb.WriteString("    stripes:\n")
+		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
 		sb.WriteString("        color: {rgb: {r: 0, g: 255, b: 0}}\n")
 	} else {
 		sb.WriteString("mode: mono\n")

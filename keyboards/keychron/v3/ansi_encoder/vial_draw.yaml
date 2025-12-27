@@ -32,7 +32,49 @@ keyboard:
     - [76 77 78 79 80 81 82 83 84 85 86]
 
 draw:
-  # Example: all rows same color
+  # Russian - tricolor flag (white/blue/red)
+  - layout: ru
+    stripes:
+      - rows: [0 1]
+        color: {rgb: {r: 255, g: 255, b: 255}}  # white
+      - rows: [2 3]
+        color: {rgb: {r: 0, g: 50, b: 255}}    # blue
+      - rows: [4 5]
+        color: {rgb: {r: 255, g: 0, b: 0}}      # red
+
+  # English - blue
+  - layout: us
+    stripes:
+      - rows: [0 1 2 3 4 5]
+        color: {rgb: {r: 0, g: 100, b: 255}}
+
+  # German - gold/yellow
+  - layout: de
+    stripes:
+      - rows: [0 1 2 3 4 5]
+        color: {rgb: {r: 255, g: 200, b: 0}}
+
+  # French - blue
+  - layout: fr
+    stripes:
+      - rows: [0 1 2 3 4 5]
+        color: {rgb: {r: 0, g: 50, b: 200}}
+
+  # Spanish - orange
+  - layout: es
+    stripes:
+      - rows: [0 1 2 3 4 5]
+        color: {rgb: {r: 255, g: 100, b: 0}}
+
+  # Ukrainian - blue/yellow flag
+  - layout: ua
+    stripes:
+      - rows: [0 1 2]
+        color: {rgb: {r: 0, g: 90, b: 200}}    # blue
+      - rows: [3 4 5]
+        color: {rgb: {r: 255, g: 215, b: 0}}   # yellow
+
+  # Fallback - green
   - layout: "*"
     stripes:
       - rows: [0 1 2 3 4 5]
