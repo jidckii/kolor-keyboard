@@ -53,7 +53,14 @@ clean:
 	go clean
 
 test:
-	go test -v ./...
+	go test -v -race -coverprofile=coverage.out ./...
+	go tool cover -func=coverage.out
+	@echo ""
+	@echo "To view HTML coverage report: make coverage-html"
+
+coverage-html: test
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report: coverage.html"
 
 # Установка udev rules (требует sudo)
 install-udev:
