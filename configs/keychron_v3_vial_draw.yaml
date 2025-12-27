@@ -11,6 +11,10 @@ device:
 firmware: vial
 mode: draw
 
+# Глобальные настройки RGB
+brightness: 200  # 0-255, яркость подсветки
+speed: 128       # 0-255, скорость эффектов
+
 # Раскладка LED для Keychron V3 ANSI Encoder (87 LEDs)
 # Индексы LED для каждого ряда клавиатуры
 keyboard:
@@ -33,11 +37,11 @@ draw:
   - layout: ru
     stripes:
       - rows: [0, 1]       # Верхние 2 ряда - белый
-        color: {r: 255, g: 255, b: 255}
+        color: {rgb: {r: 255, g: 255, b: 255}}
       - rows: [2, 3]       # Средние 2 ряда - синий
-        color: {r: 0, g: 50, b: 255}
+        color: {rgb: {r: 0, g: 50, b: 255}}
       - rows: [4, 5]       # Нижние 2 ряда - красный
-        color: {r: 255, g: 0, b: 0}
+        color: {rgb: {r: 255, g: 0, b: 0}}
 
   # Флаг США: синий угол (canton) + чередующиеся красно-белые полосы
   # LED Map: см. docs/LED_MAP.md
@@ -45,30 +49,30 @@ draw:
     stripes:
       # Синий canton (левый верхний угол, 3 ряда по 7 клавиш)
       - leds: [0, 1, 2, 3, 4, 5, 6]         # Row 0: ESC, F1-F6
-        color: {r: 0, g: 50, b: 180}
+        color: {hsv: {h: 170, s: 255, v: 180}}
       - leds: [16, 17, 18, 19, 20, 21, 22]  # Row 1: ~, 1-6
-        color: {r: 0, g: 50, b: 180}
+        color: {hsv: {h: 170, s: 255, v: 180}}
       - leds: [33, 34, 35, 36, 37, 38, 39]  # Row 2: Tab, Q-Y
-        color: {r: 0, g: 50, b: 180}
+        color: {hsv: {h: 170, s: 255, v: 180}}
 
       # Красные полосы (начинаются справа от canton + целые ряды)
       - leds: [7, 8, 9, 10, 11, 12, 13, 14, 15]         # Row 0 right: F7-Light
-        color: {r: 255, g: 0, b: 0}
+        color: {rgb: {r: 255, g: 0, b: 0}}
       - leds: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49]  # Row 2 right: U-PgDn
-        color: {r: 255, g: 0, b: 0}
+        color: {rgb: {r: 255, g: 0, b: 0}}
       - rows: [4]  # Row 4 full: LShift-Up (LED 63-75)
-        color: { r: 255, g: 0, b: 0 }
+        color: {rgb: {r: 255, g: 0, b: 0}}
 
       # Белые полосы
       - leds: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32]  # Row 1 right: 7-PgUp
-        color: {r: 255, g: 255, b: 255}
+        color: {hsv: {h: 0, s: 0, v: 255}}
       - rows: [3]  # Row 3 full: Caps-Enter (LED 50-62)
-        color: {r: 255, g: 255, b: 255}
+        color: {rgb: {r: 255, g: 255, b: 255}}
       - rows: [5]  # Row 5 full: LCtrl-Right (LED 76-86)
-        color: {r: 255, g: 255, b: 255}
+        color: {rgb: {r: 255, g: 255, b: 255}}
 
   # Fallback - зелёный
   - layout: "*"
     stripes:
       - rows: [0, 1, 2, 3, 4, 5]
-        color: {r: 0, g: 255, b: 0}
+        color: {hsv: {h: 85, s: 255, v: 255}}

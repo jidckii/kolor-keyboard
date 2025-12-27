@@ -11,15 +11,19 @@ device:
 firmware: vial
 mode: mono
 
-colors:
-  # Русская раскладка - красный
-  - layout: ru
-    color: {r: 255, g: 0, b: 0}
+# Глобальные настройки RGB
+brightness: 200  # 0-255, яркость подсветки
+speed: 128       # 0-255, скорость эффектов
 
-  # Английская раскладка - синий
+colors:
+  # Русская раскладка - красный (RGB формат)
+  - layout: ru
+    color: {rgb: {r: 255, g: 0, b: 0}}
+
+  # Английская раскладка - синий (HSV формат)
   - layout: us
-    color: {r: 0, g: 0, b: 255}
+    color: {hsv: {h: 170, s: 255, v: 255}}
 
   # Fallback - белый
   - layout: "*"
-    color: {r: 255, g: 255, b: 255}
+    color: {rgb: {r: 255, g: 255, b: 255}}

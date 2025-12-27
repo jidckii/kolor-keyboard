@@ -160,11 +160,16 @@ func (d *VIARGBDevice) EnableSolidColor() error {
 // EnableVialDirectMode включает режим прямого управления LED через Vial RGB
 // Это нужно для per-key RGB. Использует команду 0x41 (vialrgb_set_mode)
 func (d *VIARGBDevice) EnableVialDirectMode() error {
+	return d.EnableVialDirectModeWithSpeed(128)
+}
+
+// EnableVialDirectModeWithSpeed включает режим прямого управления LED с указанной скоростью
+func (d *VIARGBDevice) EnableVialDirectModeWithSpeed(speed uint8) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	// mode=1 (VIALRGB_EFFECT_DIRECT), speed=128, HSV=0,255,255
-	packet := BuildVialSetModePacket(VialEffectDirect, 128, 0, 255, 255)
+	// mode=1 (VIALRGB_EFFECT_DIRECT), HSV=0,255,255
+	packet := BuildVialSetModePacket(VialEffectDirect, speed, 0, 255, 255)
 	return d.write(packet)
 }
 
