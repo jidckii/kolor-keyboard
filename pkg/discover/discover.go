@@ -259,10 +259,10 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 	sb.WriteString("# kolor-keyboard configuration\n")
 	sb.WriteString(fmt.Sprintf("# Generated for: %s %s\n", cfg.Device.Manufacturer, cfg.Device.Product))
 	sb.WriteString(fmt.Sprintf("# Keyboard: %s/%s/%s\n", vendor, model, variant))
-	sb.WriteString(fmt.Sprintf("# Device: VID=%04X PID=%04X\n", cfg.Device.VendorID, cfg.Device.ProductID))
+	sb.WriteString(fmt.Sprintf("# Device: VID=%04X PID=%04X, Firmware: %s\n", cfg.Device.VendorID, cfg.Device.ProductID, cfg.Firmware))
 	sb.WriteString("\n")
 
-	sb.WriteString(fmt.Sprintf("firmware: %s\n", cfg.Firmware))
+	// firmware и device автоопределяются в runtime
 
 	if cfg.Firmware == "vial" && len(cfg.KeyboardRows) > 0 {
 		sb.WriteString("mode: draw\n")

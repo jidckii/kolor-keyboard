@@ -196,6 +196,16 @@ colors:
 			wantErr: false, // device опционален — будет автоопределение
 		},
 		{
+			name: "missing firmware (auto-detect)",
+			config: `
+mode: mono
+colors:
+  - layout: "*"
+    color: {rgb: {r: 255, g: 0, b: 0}}
+`,
+			wantErr: false, // firmware опционален — будет автоопределение
+		},
+		{
 			name: "device with missing vendor_id",
 			config: `
 device:

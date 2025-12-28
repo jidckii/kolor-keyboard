@@ -19,10 +19,7 @@ func Load(path string) (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	// Если firmware не указан, используем vial
-	if cfg.Firmware == "" {
-		cfg.Firmware = FirmwareVial
-	}
+	// firmware может быть пустым — будет автоопределение в runtime
 
 	// Если mode не указан, используем mono
 	if cfg.Mode == "" {
@@ -45,15 +42,15 @@ func (c *Config) Validate() error {
 		}
 	}
 
-	// Проверяем firmware
+	// Проверяем firmware (пустой = автоопределение)
 	switch c.Firmware {
-	case FirmwareStock, FirmwareVial:
+	case "", FirmwareStock, FirmwareVial:
 		// ok
 	default:
 		return fmt.Errorf("unknown firmware: %s (expected 'stock' or 'vial')", c.Firmware)
 	}
 
-	// draw режим доступен только для vial
+	// draw режим доступен только для vial (проверка если firmware указан явно)
 	if c.Mode == ModeDraw && c.Firmware == FirmwareStock {
 		return fmt.Errorf("draw mode requires vial firmware (stock firmware only supports mono mode)")
 	}

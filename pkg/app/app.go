@@ -92,6 +92,30 @@ func New(configPath string, logger *slog.Logger) (*App, error) {
 		discover.VIAUsage,
 	)
 
+	// Автоопределение firmware если не указан
+	if cfg.Firmware == "" {
+		if err := device.Open(); err != nil {
+			return nil, fmt.Errorf("failed to open device for firmware detection: %w", err)
+		}
+
+		// Пробуем получить количество LED через Vial команду
+		ledCount, err := device.GetLEDCount()
+		device.Close()
+
+		if err == nil && ledCount > 0 {
+			cfg.Firmware = config.FirmwareVial
+			logger.Info("auto-detected firmware", "firmware", "vial", "led_count", ledCount)
+		} else {
+			cfg.Firmware = config.FirmwareStock
+			logger.Info("auto-detected firmware", "firmware", "stock")
+		}
+
+		// Проверка: draw режим требует vial
+		if cfg.Mode == config.ModeDraw && cfg.Firmware == config.FirmwareStock {
+			return nil, fmt.Errorf("draw mode requires vial firmware, but device only supports stock")
+		}
+	}
+
 	return &App{
 		cfg:     cfg,
 		watcher: watcher,

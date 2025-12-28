@@ -1,14 +1,8 @@
 # kolor-keyboard configuration
 # Generated for: Keychron Keychron V3
 # Keyboard: keychron/v3/ansi_encoder
+# Device: VID=3434 PID=0331, Firmware: vial
 
-device:
-  vendor_id: 0x3434
-  product_id: 0x0331
-  usage_page: 0xFF60
-  usage: 0x61
-
-firmware: vial
 mode: mono
 
 # Global RGB settings

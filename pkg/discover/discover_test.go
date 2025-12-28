@@ -26,8 +26,7 @@ func TestGenerateConfig(t *testing.T) {
 				KeyboardRows: [][]int{{0, 1, 2}, {3, 4, 5}},
 			},
 			wantContains: []string{
-				"# Device: VID=3434 PID=0331", // device info в комментарии
-				"firmware: vial",
+				"# Device: VID=3434 PID=0331, Firmware: vial", // device info в комментарии
 				"mode: draw",
 				"keyboard:",
 				"rows:",
@@ -52,7 +51,7 @@ func TestGenerateConfig(t *testing.T) {
 				KeyboardRows: nil,
 			},
 			wantContains: []string{
-				"firmware: vial",
+				"Firmware: vial", // в комментарии
 				"mode: mono",
 				"colors:",
 			},
@@ -71,8 +70,7 @@ func TestGenerateConfig(t *testing.T) {
 				Firmware: "stock",
 			},
 			wantContains: []string{
-				"# Device: VID=1234 PID=5678", // device info в комментарии
-				"firmware: stock",
+				"# Device: VID=1234 PID=5678, Firmware: stock", // device info в комментарии
 				"mode: mono",
 				"colors:",
 			},
@@ -113,7 +111,7 @@ func TestGenerateConfigVialWithRows(t *testing.T) {
 	}
 
 	// Check device info in comment (not as YAML section)
-	if !strings.Contains(config, "# Device: VID=3434 PID=0331") {
+	if !strings.Contains(config, "# Device: VID=3434 PID=0331, Firmware: vial") {
 		t.Error("Missing device info comment")
 	}
 
