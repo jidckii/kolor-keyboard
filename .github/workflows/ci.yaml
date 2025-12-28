@@ -80,7 +80,7 @@ jobs:
           version: latest
           args: --timeout=5m
 
-goreleaser-check:
+  goreleaser-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
