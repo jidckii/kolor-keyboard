@@ -156,6 +156,14 @@ keyboards/<vendor>/<model>/<variant>/
 ./kolor-keyboard discover
 ./kolor-keyboard discover --global
 
+# Управление systemd user service
+./kolor-keyboard service install    # Установить и запустить
+./kolor-keyboard service uninstall  # Остановить и удалить
+./kolor-keyboard service start      # Запустить
+./kolor-keyboard service stop       # Остановить
+./kolor-keyboard service restart    # Перезапустить
+./kolor-keyboard service status     # Показать статус
+
 # Показать версию
 ./kolor-keyboard version
 ```
@@ -164,9 +172,7 @@ keyboards/<vendor>/<model>/<variant>/
 
 Команда `run` ищет конфиг в следующем порядке:
 1. Путь указанный через `-c/--config`
-2. `./kolor-keyboard.yaml` (текущая директория)
-3. `~/.config/kolor-keyboard/config.yaml`
-4. Авто-сгенерированные конфиги в `~/.config/kolor-keyboard/keyboards/`
+2. `~/.config/kolor-keyboard/config.yaml`
 
 ---
 
@@ -188,7 +194,6 @@ color: {hsv: {h: 0, s: 255, v: 255}}
 
 ```yaml
 brightness: 200  # 0-255, яркость подсветки
-speed: 128       # 0-255, скорость эффектов (только Vial)
 ```
 
 ### Режим Mono
@@ -221,7 +226,6 @@ firmware: vial
 mode: draw
 
 brightness: 200
-speed: 128
 
 keyboard:
   rows:
@@ -259,6 +263,7 @@ kolor-keyboard/
 │       ├── root.go
 │       ├── run.go
 │       ├── discover.go
+│       ├── service.go             # Управление systemd service
 │       └── version.go
 ├── pkg/
 │   ├── app/app.go                 # Главное приложение
@@ -272,11 +277,6 @@ kolor-keyboard/
 │       ├── vial_mono.yaml
 │       └── vial_draw.yaml
 ├── examples/                      # Примеры конфигов
-├── docs/
-│   ├── FIRMWARE.md                # Инструкция по прошивке Vial
-│   └── LED_MAP.md                 # Карта LED для клавиатур
-├── scripts/
-│   └── kolor-keyboard.service     # systemd unit
 ├── Makefile
 └── README.md
 ```

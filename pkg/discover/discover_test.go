@@ -30,8 +30,8 @@ func TestGenerateConfig(t *testing.T) {
 				"mode: draw",
 				"keyboard:",
 				"rows:",
-				"- [0 1 2]",
-				"- [3 4 5]",
+				"- [0, 1, 2]",
+				"- [3, 4, 5]",
 				"draw:",
 				"stripes:",
 			},
@@ -132,7 +132,7 @@ func TestGenerateConfigVialWithRows(t *testing.T) {
 	}
 
 	// Check all rows index
-	if !strings.Contains(config, "- rows: [0 1 2]") {
+	if !strings.Contains(config, "- rows: [0, 1, 2]") {
 		t.Error("Missing rows index")
 	}
 

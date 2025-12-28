@@ -182,12 +182,13 @@ func (d *VIARGBDevice) EnableVialDirectModeWithSpeed(speed uint8) error {
 
 // GetLEDCount возвращает количество LED
 func (d *VIARGBDevice) GetLEDCount() (int, error) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	// Проверка кэша под мьютексом для избежания data race
 	if d.ledCount > 0 {
 		return d.ledCount, nil
 	}
-
-	d.mu.Lock()
-	defer d.mu.Unlock()
 
 	packet := BuildGetLEDCountPacket()
 	response, err := d.writeWithResponse(packet)
