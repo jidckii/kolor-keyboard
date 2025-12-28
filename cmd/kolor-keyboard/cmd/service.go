@@ -157,7 +157,7 @@ func installService() error {
 	serviceContent := fmt.Sprintf(serviceTemplate, exePath)
 
 	// Write service file
-	if err := os.WriteFile(servicePath, []byte(serviceContent), 0644); err != nil {
+	if err := os.WriteFile(servicePath, []byte(serviceContent), 0600); err != nil {
 		return fmt.Errorf("failed to write service file: %w", err)
 	}
 	fmt.Printf("Created: %s\n", servicePath)
@@ -226,7 +226,7 @@ func uninstallService() error {
 
 func systemctl(args ...string) error {
 	allArgs := append([]string{"--user"}, args...)
-	cmd := exec.Command("systemctl", allArgs...) //nolint:gosec // systemctl is safe
+	cmd := exec.Command("systemctl", allArgs...) //nolint:gosec,noctx // systemctl is safe, context not needed for CLI
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
@@ -234,7 +234,7 @@ func systemctl(args ...string) error {
 
 func systemctlQuiet(args ...string) error {
 	allArgs := append([]string{"--user"}, args...)
-	cmd := exec.Command("systemctl", allArgs...) //nolint:gosec // systemctl is safe
+	cmd := exec.Command("systemctl", allArgs...) //nolint:gosec,noctx // systemctl is safe, context not needed for CLI
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%w: %s", err, strings.TrimSpace(string(output)))

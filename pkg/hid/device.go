@@ -227,7 +227,7 @@ func (d *VIARGBDevice) SetLEDs(updates []LEDUpdate) error {
 			if v > 255 {
 				v = 255
 			}
-			colors[j] = HSVColor{H: u.Color.H, S: u.Color.S, V: uint8(v)}
+			colors[j] = HSVColor{H: u.Color.H, S: u.Color.S, V: uint8(v)} //nolint:gosec // v is already clamped to 255 above
 		}
 
 		packet := BuildDirectSetPacket(startIndex, colors)

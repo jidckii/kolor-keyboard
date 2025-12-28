@@ -161,7 +161,7 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 		// Показываем уже сохранённые ряды разными оттенками жёлтого
 		for rowIdx, row := range rows {
 			// Оттенки жёлтого: H=20-40 (оранжево-жёлтый спектр)
-			hue := uint8(20 + (rowIdx%5)*4) // 20, 24, 28, 32, 36, циклично
+			hue := uint8(20 + (rowIdx%5)*4) //nolint:gosec // max value is 20+4*4=36, fits in uint8
 			for _, idx := range row {
 				_ = device.SetLEDs([]hid.LEDUpdate{
 					{Index: idx, Color: hid.HSVColor{H: hue, S: 255, V: 200}},

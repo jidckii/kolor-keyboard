@@ -1,23 +1,38 @@
+version: "2"
+
 run:
   timeout: 5m
   modules-download-mode: readonly
 
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
 linters:
   enable:
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
     - unused
-    - gofmt
-    - goimports
     - misspell
     - unconvert
     - bodyclose
     - noctx
     - gosec
     - prealloc
+  exclusions:
+    rules:
+      # Exclude some linters from running on tests files
+      - path: _test\.go
+        linters:
+          - gosec
+          - errcheck
+      # Exclude some staticcheck messages
+      - linters:
+          - staticcheck
+        text: "SA9003:"
 
 linters-settings:
   errcheck:
@@ -31,16 +46,3 @@ linters-settings:
       - G104  # Unhandled errors (we handle them consciously)
   misspell:
     locale: US
-
-issues:
-  exclude-use-default: false
-  exclude-rules:
-    # Exclude some linters from running on tests files
-    - path: _test\.go
-      linters:
-        - gosec
-        - errcheck
-    # Exclude some staticcheck messages
-    - linters:
-        - staticcheck
-      text: "SA9003:"
