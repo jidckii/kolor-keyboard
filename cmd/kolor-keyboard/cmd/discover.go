@@ -189,7 +189,7 @@ func saveGlobalConfig(cfg *discover.DiscoveredConfig) error {
 	fmt.Println("\nNext steps:")
 	fmt.Println("  1. Edit the config to customize colors for different layouts")
 	fmt.Println("  2. Run: kolor-keyboard run")
-	fmt.Println("  3. Or install as service: sudo make install && sudo systemctl enable --now kolor-keyboard@$USER")
+	fmt.Println("  3. Or install as service: kolor-keyboard service install")
 
 	return nil
 }
