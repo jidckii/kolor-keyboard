@@ -1,6 +1,6 @@
 module github.com/jidckii/kolor-keyboard
 
-go 1.25
+go 1.23
 
 require (
 	github.com/godbus/dbus/v5 v5.1.0
