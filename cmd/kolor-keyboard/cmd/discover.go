@@ -21,13 +21,16 @@ var discoverCmd = &cobra.Command{
 	Short: "Discover keyboard and generate config",
 	Long: `Scan for VIA/Vial compatible keyboards and generate configuration files.
 
-By default, generates config files in the current directory with names:
-  - stock_mono.yaml   (for Stock QMK/VIA firmware)
-  - vial_mono.yaml    (for Vial firmware, mono color mode)
-  - vial_draw.yaml    (for Vial firmware, per-key RGB mode)
+By default, generates example config files in the current directory:
+  keyboards/<vendor>/<model>/<variant>/
+    - stock_mono.yaml   (for Stock QMK/VIA firmware)
+    - vial_mono.yaml    (for Vial firmware, mono color mode)
+    - vial_draw.yaml    (for Vial firmware, per-key RGB mode)
 
 With --global flag, generates a single config.yaml in:
-  ~/.config/kolor-keyboard/keyboards/<vendor>/<model>/<variant>/config.yaml`,
+  ~/.config/kolor-keyboard/config.yaml
+
+The firmware type (stock/vial) is auto-detected.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return runDiscover()
 	},
@@ -133,12 +136,14 @@ func runDiscover() error {
 	vendor, model, variant := discover.GetKeyboardInfo(selectedDev)
 	fmt.Printf("\nKeyboard identified as: %s/%s/%s\n", vendor, model, variant)
 
-	// Determine output path
-	var outDir string
 	if globalConfig {
-		home, _ := os.UserHomeDir()
-		outDir = filepath.Join(home, ".config/kolor-keyboard/keyboards", vendor, model, variant)
-	} else if outputDir != "" {
+		// Single config.yaml in ~/.config/kolor-keyboard/
+		return saveGlobalConfig(cfg)
+	}
+
+	// Multiple example config files in local keyboards/ directory
+	var outDir string
+	if outputDir != "" {
 		outDir = filepath.Join(outputDir, vendor, model, variant)
 	} else {
 		outDir = filepath.Join("keyboards", vendor, model, variant)
@@ -149,17 +154,18 @@ func runDiscover() error {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	if globalConfig {
-		// Single config.yaml for global mode
-		return saveGlobalConfig(outDir, cfg)
-	}
-
-	// Multiple config files for local mode
 	return saveLocalConfigs(outDir, cfg)
 }
 
-func saveGlobalConfig(outDir string, cfg *discover.DiscoveredConfig) error {
-	outPath := filepath.Join(outDir, "config.yaml")
+func saveGlobalConfig(cfg *discover.DiscoveredConfig) error {
+	home, _ := os.UserHomeDir()
+	configDir := filepath.Join(home, ".config/kolor-keyboard")
+	outPath := filepath.Join(configDir, "config.yaml")
+
+	// Create directory
+	if err := os.MkdirAll(configDir, 0755); err != nil {
+		return fmt.Errorf("failed to create config directory: %w", err)
+	}
 
 	// Check if exists
 	if _, err := os.Stat(outPath); err == nil {
@@ -183,7 +189,7 @@ func saveGlobalConfig(outDir string, cfg *discover.DiscoveredConfig) error {
 	fmt.Println("\nNext steps:")
 	fmt.Println("  1. Edit the config to customize colors for different layouts")
 	fmt.Println("  2. Run: kolor-keyboard run")
-	fmt.Println("  3. Or install as service: make install && make enable")
+	fmt.Println("  3. Or install as service: sudo make install && sudo systemctl enable --now kolor-keyboard@$USER")
 
 	return nil
 }
@@ -228,16 +234,17 @@ func saveLocalConfigs(outDir string, cfg *discover.DiscoveredConfig) error {
 		savedFiles = append(savedFiles, vialDrawPath)
 	}
 
-	fmt.Printf("\n✓ Configs saved to: %s/\n", outDir)
+	fmt.Printf("\n✓ Example configs saved to: %s/\n", outDir)
 	for _, f := range savedFiles {
 		fmt.Printf("  - %s\n", filepath.Base(f))
 	}
 
-	fmt.Println("\nNext steps:")
-	fmt.Println("  1. Copy desired config to ~/.config/kolor-keyboard/config.yaml")
-	fmt.Printf("     cp %s ~/.config/kolor-keyboard/config.yaml\n", savedFiles[0])
-	fmt.Println("  2. Or run with specific config:")
-	fmt.Printf("     kolor-keyboard run -c %s\n", savedFiles[0])
+	fmt.Println("\nThese are example configs for reference.")
+	fmt.Println("For quick setup, use: kolor-keyboard discover -g")
+	fmt.Println("")
+	fmt.Println("Or copy desired config manually:")
+	fmt.Printf("  mkdir -p ~/.config/kolor-keyboard\n")
+	fmt.Printf("  cp %s ~/.config/kolor-keyboard/config.yaml\n", savedFiles[0])
 
 	return nil
 }

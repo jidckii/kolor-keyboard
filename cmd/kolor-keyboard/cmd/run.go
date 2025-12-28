@@ -21,9 +21,9 @@ and updates the RGB backlight accordingly.
 
 The config file is searched in the following order:
   1. Path specified with -c/--config flag
-  2. ./kolor-keyboard.yaml (current directory)
-  3. ~/.config/kolor-keyboard/config.yaml
-  4. Auto-generated configs in ~/.config/kolor-keyboard/keyboards/`,
+  2. ~/.config/kolor-keyboard/config.yaml
+
+Device and firmware are auto-detected if not specified in config.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := configPath
 		if cfg == "" {
@@ -31,11 +31,10 @@ The config file is searched in the following order:
 		}
 
 		if cfg == "" {
-			fmt.Fprintln(os.Stderr, "Config file not found. Searched locations:")
-			fmt.Fprintln(os.Stderr, "  - ./kolor-keyboard.yaml")
-			fmt.Fprintln(os.Stderr, "  - ~/.config/kolor-keyboard/config.yaml")
+			fmt.Fprintln(os.Stderr, "Config file not found.")
+			fmt.Fprintln(os.Stderr, "Expected: ~/.config/kolor-keyboard/config.yaml")
 			fmt.Fprintln(os.Stderr, "")
-			fmt.Fprintln(os.Stderr, "Tip: Run 'kolor-keyboard discover' to detect your keyboard and generate a config")
+			fmt.Fprintln(os.Stderr, "Tip: Run 'kolor-keyboard discover -g' to detect your keyboard and generate a config")
 			return fmt.Errorf("config file not found")
 		}
 
@@ -59,47 +58,10 @@ func init() {
 
 func findConfig() string {
 	home, _ := os.UserHomeDir()
+	configPath := filepath.Join(home, ".config/kolor-keyboard/config.yaml")
 
-	// Explicit paths first
-	paths := []string{
-		"kolor-keyboard.yaml",
-		filepath.Join(home, ".config/kolor-keyboard/config.yaml"),
-	}
-
-	for _, p := range paths {
-		if _, err := os.Stat(p); err == nil {
-			return p
-		}
-	}
-
-	// Search in keyboards directory (auto-generated configs)
-	keyboardsDir := filepath.Join(home, ".config/kolor-keyboard/keyboards")
-	if entries, err := os.ReadDir(keyboardsDir); err == nil {
-		for _, vendor := range entries {
-			if !vendor.IsDir() {
-				continue
-			}
-			vendorPath := filepath.Join(keyboardsDir, vendor.Name())
-			if models, err := os.ReadDir(vendorPath); err == nil {
-				for _, model := range models {
-					if !model.IsDir() {
-						continue
-					}
-					modelPath := filepath.Join(vendorPath, model.Name())
-					if variants, err := os.ReadDir(modelPath); err == nil {
-						for _, variant := range variants {
-							if !variant.IsDir() {
-								continue
-							}
-							configPath := filepath.Join(modelPath, variant.Name(), "config.yaml")
-							if _, err := os.Stat(configPath); err == nil {
-								return configPath
-							}
-						}
-					}
-				}
-			}
-		}
+	if _, err := os.Stat(configPath); err == nil {
+		return configPath
 	}
 
 	return ""
