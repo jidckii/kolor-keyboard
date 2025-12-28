@@ -221,12 +221,11 @@ func (a *App) initializeMode() error {
 		} else {
 			a.logger.Info("detected LED count", "count", ledCount)
 		}
-		// Включаем Vial Direct режим с указанной скоростью
-		speed := a.cfg.GetSpeed()
-		if err := a.device.EnableVialDirectModeWithSpeed(speed); err != nil {
+		// Включаем Vial Direct режим
+		if err := a.device.EnableVialDirectMode(); err != nil {
 			return fmt.Errorf("failed to enable Vial direct mode: %w", err)
 		}
-		a.logger.Info("Vial direct mode enabled", "speed", speed)
+		a.logger.Info("Vial direct mode enabled")
 	}
 	return nil
 }
@@ -274,9 +273,8 @@ func (a *App) applyMonoStock(color *config.RGBColor) error {
 
 // applyMonoVial применяет цвет через Vial Direct режим (vial прошивка)
 func (a *App) applyMonoVial(color *config.RGBColor) error {
-	// Включаем Vial Direct режим с указанной скоростью
-	speed := a.cfg.GetSpeed()
-	if err := a.device.EnableVialDirectModeWithSpeed(speed); err != nil {
+	// Включаем Vial Direct режим
+	if err := a.device.EnableVialDirectMode(); err != nil {
 		a.logger.Warn("failed to enable Vial direct mode", "error", err)
 	}
 
@@ -311,8 +309,7 @@ func (a *App) applyFlagLayout(layout string) error {
 	}
 
 	// Каждый раз включаем Vial Direct режим (на случай если пользователь переключил режим)
-	speed := a.cfg.GetSpeed()
-	if err := a.device.EnableVialDirectModeWithSpeed(speed); err != nil {
+	if err := a.device.EnableVialDirectMode(); err != nil {
 		a.logger.Warn("failed to re-enable Vial direct mode", "error", err)
 	}
 

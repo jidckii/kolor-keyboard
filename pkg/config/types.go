@@ -26,7 +26,6 @@ type Config struct {
 
 	// Глобальные настройки RGB
 	Brightness *uint8 `yaml:"brightness,omitempty"` // 0-255 (nil = не менять)
-	Speed      *uint8 `yaml:"speed,omitempty"`      // 0-255 (nil = 128 по умолчанию)
 
 	// Для mono режима - один цвет на всю клавиатуру
 	Colors []ColorMapping `yaml:"colors,omitempty"`

@@ -148,11 +148,3 @@ func (c *Config) GetAllLEDIndices() []int {
 	}
 	return indices
 }
-
-// GetSpeed возвращает скорость эффектов (или 128 по умолчанию)
-func (c *Config) GetSpeed() uint8 {
-	if c.Speed != nil {
-		return *c.Speed
-	}
-	return 128 // по умолчанию
-}

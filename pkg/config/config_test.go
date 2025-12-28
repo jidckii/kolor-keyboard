@@ -22,8 +22,6 @@ firmware: vial
 mode: mono
 
 brightness: 200
-speed: 64
-
 colors:
   - layout: ru
     color: {rgb: {r: 255, g: 0, b: 0}}
@@ -60,12 +58,9 @@ colors:
 		t.Errorf("Mode = %s, want mono", cfg.Mode)
 	}
 
-	// Проверяем brightness и speed
+	// Проверяем brightness
 	if cfg.Brightness == nil || *cfg.Brightness != 200 {
 		t.Errorf("Brightness = %v, want 200", cfg.Brightness)
-	}
-	if cfg.Speed == nil || *cfg.Speed != 64 {
-		t.Errorf("Speed = %v, want 64", cfg.Speed)
 	}
 
 	// Проверяем colors
@@ -143,22 +138,6 @@ draw:
 	}
 	if len(flag.Stripes) != 2 {
 		t.Errorf("len(Stripes) = %d, want 2", len(flag.Stripes))
-	}
-}
-
-func TestGetSpeed(t *testing.T) {
-	cfg := &Config{}
-
-	// Без указания speed - должно быть 128
-	if cfg.GetSpeed() != 128 {
-		t.Errorf("GetSpeed() = %d, want 128 (default)", cfg.GetSpeed())
-	}
-
-	// С указанием speed
-	speed := uint8(64)
-	cfg.Speed = &speed
-	if cfg.GetSpeed() != 64 {
-		t.Errorf("GetSpeed() = %d, want 64", cfg.GetSpeed())
 	}
 }
 

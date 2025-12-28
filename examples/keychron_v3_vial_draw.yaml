@@ -2,18 +2,10 @@
 # Рисует флаги стран на клавиатуре
 # Требует прошивку Vial (см. docs/FIRMWARE.md)
 
-device:
-  vendor_id: 0x3434
-  product_id: 0x0331
-  usage_page: 0xFF60
-  usage: 0x61
-
-firmware: vial
 mode: draw
 
 # Глобальные настройки RGB
 brightness: 128  # 0-255, яркость подсветки
-speed: 128       # 0-255, скорость эффектов
 
 # Раскладка LED для Keychron V3 ANSI Encoder (87 LEDs)
 # Индексы LED для каждого ряда клавиатуры
