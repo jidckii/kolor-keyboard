@@ -73,7 +73,7 @@ var serviceStartCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start the service",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return systemctl("start")
+		return systemctl("start", serviceName)
 	},
 }
 
@@ -81,7 +81,7 @@ var serviceStopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "Stop the service",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return systemctl("stop")
+		return systemctl("stop", serviceName)
 	},
 }
 
@@ -89,7 +89,7 @@ var serviceRestartCmd = &cobra.Command{
 	Use:   "restart",
 	Short: "Restart the service",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return systemctl("restart")
+		return systemctl("restart", serviceName)
 	},
 }
 
@@ -97,7 +97,7 @@ var serviceStatusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show service status",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return systemctl("status")
+		return systemctl("status", serviceName)
 	},
 }
 

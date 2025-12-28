@@ -250,6 +250,15 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 	return rows, nil
 }
 
+// formatIntSlice форматирует []int в YAML-совместимый формат [0, 1, 2]
+func formatIntSlice(nums []int) string {
+	strs := make([]string, len(nums))
+	for i, n := range nums {
+		strs[i] = fmt.Sprintf("%d", n)
+	}
+	return "[" + strings.Join(strs, ", ") + "]"
+}
+
 // GenerateConfig генерирует YAML конфигурацию
 func GenerateConfig(cfg *DiscoveredConfig) string {
 	var sb strings.Builder
@@ -275,7 +284,7 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 		sb.WriteString("  rows:\n")
 		for i, row := range cfg.KeyboardRows {
 			sb.WriteString(fmt.Sprintf("    # Row %d (%d LEDs)\n", i, len(row)))
-			sb.WriteString(fmt.Sprintf("    - %v\n", row))
+			sb.WriteString(fmt.Sprintf("    - %s\n", formatIntSlice(row)))
 		}
 		sb.WriteString("\n")
 		sb.WriteString("draw:\n")
@@ -297,14 +306,14 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 			whiteRows := allRows[:third]
 			blueRows := allRows[third : third*2]
 			redRows := allRows[third*2:]
-			sb.WriteString(fmt.Sprintf("      - rows: %v\n", whiteRows))
+			sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(whiteRows)))
 			sb.WriteString("        color: {rgb: {r: 255, g: 255, b: 255}}  # white\n")
-			sb.WriteString(fmt.Sprintf("      - rows: %v\n", blueRows))
+			sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(blueRows)))
 			sb.WriteString("        color: {rgb: {r: 0, g: 50, b: 255}}    # blue\n")
-			sb.WriteString(fmt.Sprintf("      - rows: %v\n", redRows))
+			sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(redRows)))
 			sb.WriteString("        color: {rgb: {r: 255, g: 0, b: 0}}      # red\n")
 		} else {
-			sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+			sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(allRows)))
 			sb.WriteString("        color: {rgb: {r: 255, g: 0, b: 0}}\n")
 		}
 		sb.WriteString("\n")
@@ -313,7 +322,7 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 		sb.WriteString("  # English - blue\n")
 		sb.WriteString("  - layout: us\n")
 		sb.WriteString("    stripes:\n")
-		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+		sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(allRows)))
 		sb.WriteString("        color: {rgb: {r: 0, g: 100, b: 255}}\n")
 		sb.WriteString("\n")
 
@@ -321,7 +330,7 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 		sb.WriteString("  # German - gold/yellow\n")
 		sb.WriteString("  - layout: de\n")
 		sb.WriteString("    stripes:\n")
-		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+		sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(allRows)))
 		sb.WriteString("        color: {rgb: {r: 255, g: 200, b: 0}}\n")
 		sb.WriteString("\n")
 
@@ -329,7 +338,7 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 		sb.WriteString("  # French - blue\n")
 		sb.WriteString("  - layout: fr\n")
 		sb.WriteString("    stripes:\n")
-		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+		sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(allRows)))
 		sb.WriteString("        color: {rgb: {r: 0, g: 50, b: 200}}\n")
 		sb.WriteString("\n")
 
@@ -337,7 +346,7 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 		sb.WriteString("  # Spanish - orange\n")
 		sb.WriteString("  - layout: es\n")
 		sb.WriteString("    stripes:\n")
-		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+		sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(allRows)))
 		sb.WriteString("        color: {rgb: {r: 255, g: 100, b: 0}}\n")
 		sb.WriteString("\n")
 
@@ -349,12 +358,12 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 			half := rowCount / 2
 			blueRows := allRows[:half]
 			yellowRows := allRows[half:]
-			sb.WriteString(fmt.Sprintf("      - rows: %v\n", blueRows))
+			sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(blueRows)))
 			sb.WriteString("        color: {rgb: {r: 0, g: 90, b: 200}}    # blue\n")
-			sb.WriteString(fmt.Sprintf("      - rows: %v\n", yellowRows))
+			sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(yellowRows)))
 			sb.WriteString("        color: {rgb: {r: 255, g: 215, b: 0}}   # yellow\n")
 		} else {
-			sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+			sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(allRows)))
 			sb.WriteString("        color: {rgb: {r: 0, g: 90, b: 200}}\n")
 		}
 		sb.WriteString("\n")
@@ -363,7 +372,7 @@ func GenerateConfig(cfg *DiscoveredConfig) string {
 		sb.WriteString("  # Fallback - green\n")
 		sb.WriteString("  - layout: \"*\"\n")
 		sb.WriteString("    stripes:\n")
-		sb.WriteString(fmt.Sprintf("      - rows: %v\n", allRows))
+		sb.WriteString(fmt.Sprintf("      - rows: %s\n", formatIntSlice(allRows)))
 		sb.WriteString("        color: {rgb: {r: 0, g: 255, b: 0}}\n")
 	} else {
 		sb.WriteString("mode: mono\n")
