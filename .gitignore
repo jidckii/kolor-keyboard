@@ -1,8 +1,7 @@
 /.claude
 
 # Binary
-kolor-keyboard
-led-test
+/kolor-keyboard
 
 # IDE
 .idea/
