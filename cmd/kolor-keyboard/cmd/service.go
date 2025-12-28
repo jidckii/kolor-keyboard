@@ -15,13 +15,24 @@ const serviceName = "kolor-keyboard.service"
 // serviceTemplate - шаблон systemd user service
 const serviceTemplate = `[Unit]
 Description=Kolor Keyboard - RGB backlight based on keyboard layout
-After=graphical-session.target
+Documentation=https://github.com/jidckii/kolor-keyboard
+After=graphical-session.target dbus.service
+Wants=dbus.service
 
 [Service]
 Type=simple
 ExecStart=%s run
 Restart=on-failure
 RestartSec=5
+
+# D-Bus session environment
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%%U/bus
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
 
 [Install]
 WantedBy=default.target
