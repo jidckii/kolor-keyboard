@@ -157,6 +157,27 @@ func runDiscover() error {
 	return saveLocalConfigs(outDir, cfg)
 }
 
+func printUdevInstructions(dev *discover.DeviceInfo) {
+	fmt.Println("\n┌──────────────────────────────────────────────────────────────┐")
+	fmt.Println("│                    udev Rules Setup                         │")
+	fmt.Println("└──────────────────────────────────────────────────────────────┘")
+	fmt.Println("\nIf you have permission issues, run these commands:")
+	fmt.Println()
+	fmt.Println("# Download QMK udev rules (covers most VIA keyboards):")
+	fmt.Println("sudo wget -O /etc/udev/rules.d/50-qmk.rules \\")
+	fmt.Println("  https://raw.githubusercontent.com/qmk/qmk_firmware/master/util/udev/50-qmk.rules")
+	fmt.Println()
+	fmt.Printf("# Add rule for your keyboard (%s %s):\n", dev.Manufacturer, dev.Product)
+	fmt.Printf("echo 'SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", TAG+=\"uaccess\"' | \\\n", dev.VendorID, dev.ProductID)
+	fmt.Println("  sudo tee /etc/udev/rules.d/51-keyboard.rules")
+	fmt.Println()
+	fmt.Println("# Reload rules:")
+	fmt.Println("sudo udevadm control --reload-rules")
+	fmt.Println("sudo udevadm trigger")
+	fmt.Println()
+	fmt.Println("# Then replug your keyboard")
+}
+
 func saveGlobalConfig(cfg *discover.DiscoveredConfig) error {
 	home, _ := os.UserHomeDir()
 	configDir := filepath.Join(home, ".config/kolor-keyboard")
@@ -190,6 +211,8 @@ func saveGlobalConfig(cfg *discover.DiscoveredConfig) error {
 	fmt.Println("  1. Edit the config to customize colors for different layouts")
 	fmt.Println("  2. Run: kolor-keyboard run")
 	fmt.Println("  3. Or install as service: kolor-keyboard service install")
+
+	printUdevInstructions(&cfg.Device)
 
 	return nil
 }
@@ -245,6 +268,8 @@ func saveLocalConfigs(outDir string, cfg *discover.DiscoveredConfig) error {
 	fmt.Println("Or copy desired config manually:")
 	fmt.Printf("  mkdir -p ~/.config/kolor-keyboard\n")
 	fmt.Printf("  cp %s ~/.config/kolor-keyboard/config.yaml\n", savedFiles[0])
+
+	printUdevInstructions(&cfg.Device)
 
 	return nil
 }
