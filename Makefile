@@ -15,10 +15,6 @@ build:
 install: build
 	@echo "Installing $(BINARY)..."
 	install -Dm755 $(BINARY) $(PREFIX)/bin/$(BINARY)
-	@echo "Installing example config..."
-	mkdir -p $(CONFIG_DIR)
-	install -Dm644 keyboards/keychron/v3/ansi_encoder/vial_draw.yaml $(CONFIG_DIR)/config.yaml
-	@echo "Config installed to $(CONFIG_DIR)/config.yaml"
 
 logs:
 	journalctl --user -u kolor-keyboard.service -f
