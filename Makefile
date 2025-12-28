@@ -19,34 +19,9 @@ install: build
 	mkdir -p $(CONFIG_DIR)
 	install -Dm644 keyboards/keychron/v3/ansi_encoder/vial_draw.yaml $(CONFIG_DIR)/config.yaml
 	@echo "Config installed to $(CONFIG_DIR)/config.yaml"
-	@echo "Installing systemd service..."
-	mkdir -p $(SYSTEMD_USER_DIR)
-	install -Dm644 scripts/kolor-keyboard.service $(SYSTEMD_USER_DIR)/kolor-keyboard.service
-	systemctl --user daemon-reload
-	@echo ""
-	@echo "Installation complete!"
-	@echo "To enable and start the service, run:"
-	@echo "  make enable"
-
-enable:
-	systemctl --user enable --now kolor-keyboard.service
-	@echo "Service enabled and started"
-
-disable:
-	systemctl --user disable --now kolor-keyboard.service || true
-	@echo "Service disabled"
-
-status:
-	systemctl --user status kolor-keyboard.service
 
 logs:
 	journalctl --user -u kolor-keyboard.service -f
-
-uninstall: disable
-	rm -f $(PREFIX)/bin/$(BINARY)
-	rm -f $(SYSTEMD_USER_DIR)/kolor-keyboard.service
-	systemctl --user daemon-reload
-	@echo "Uninstalled. Config left at $(CONFIG_DIR)"
 
 clean:
 	rm -f $(BINARY)
@@ -91,7 +66,7 @@ test-dbus:
 	qdbus6 org.kde.keyboard /Layouts org.kde.KeyboardLayouts.getLayoutsList
 
 # Run in debug mode
-run-debug: build
+run: build
 	./$(BINARY) run --debug -c keyboards/keychron/v3/ansi_encoder/vial_draw.yaml
 
 # Discover keyboard and generate config
