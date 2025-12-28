@@ -79,7 +79,7 @@ func (d *VIARGBDevice) Close() error {
 	if d.device != nil {
 		err := d.device.Close()
 		d.device = nil
-		hid.Exit()
+		_ = hid.Exit()
 		return err
 	}
 	return nil
@@ -224,6 +224,9 @@ func (d *VIARGBDevice) SetLEDs(updates []LEDUpdate) error {
 		for j, u := range batch {
 			// Применяем глобальную яркость к V компоненту
 			v := uint16(u.Color.V) * uint16(d.brightness) / 255
+			if v > 255 {
+				v = 255
+			}
 			colors[j] = HSVColor{H: u.Color.H, S: u.Color.S, V: uint8(v)}
 		}
 

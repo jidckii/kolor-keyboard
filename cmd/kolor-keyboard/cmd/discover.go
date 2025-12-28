@@ -87,7 +87,7 @@ func runDiscover() error {
 
 		idx := 0
 		if input != "" {
-			fmt.Sscanf(input, "%d", &idx)
+			_, _ = fmt.Sscanf(input, "%d", &idx)
 			idx--
 		}
 		if idx < 0 || idx >= len(devices) {
@@ -150,7 +150,7 @@ func runDiscover() error {
 	}
 
 	// Create directory
-	if err := os.MkdirAll(outDir, 0755); err != nil {
+	if err := os.MkdirAll(outDir, 0750); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
@@ -184,7 +184,7 @@ func saveGlobalConfig(cfg *discover.DiscoveredConfig) error {
 	outPath := filepath.Join(configDir, "config.yaml")
 
 	// Create directory
-	if err := os.MkdirAll(configDir, 0755); err != nil {
+	if err := os.MkdirAll(configDir, 0750); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
@@ -196,13 +196,13 @@ func saveGlobalConfig(cfg *discover.DiscoveredConfig) error {
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimSpace(strings.ToLower(input))
 		if input != "y" && input != "yes" {
-			fmt.Println("Cancelled.")
+			fmt.Println("Canceled.")
 			return nil
 		}
 	}
 
 	content := discover.GenerateConfig(cfg)
-	if err := os.WriteFile(outPath, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(outPath, []byte(content), 0600); err != nil {
 		return fmt.Errorf("failed to write config: %w", err)
 	}
 
@@ -227,7 +227,7 @@ func saveLocalConfigs(outDir string, cfg *discover.DiscoveredConfig) error {
 
 	stockPath := filepath.Join(outDir, "stock_mono.yaml")
 	stockContent := discover.GenerateConfig(&stockCfg)
-	if err := os.WriteFile(stockPath, []byte(stockContent), 0644); err != nil {
+	if err := os.WriteFile(stockPath, []byte(stockContent), 0600); err != nil {
 		return fmt.Errorf("failed to write stock config: %w", err)
 	}
 	savedFiles = append(savedFiles, stockPath)
@@ -239,7 +239,7 @@ func saveLocalConfigs(outDir string, cfg *discover.DiscoveredConfig) error {
 
 	vialMonoPath := filepath.Join(outDir, "vial_mono.yaml")
 	vialMonoContent := discover.GenerateConfig(&vialMonoCfg)
-	if err := os.WriteFile(vialMonoPath, []byte(vialMonoContent), 0644); err != nil {
+	if err := os.WriteFile(vialMonoPath, []byte(vialMonoContent), 0600); err != nil {
 		return fmt.Errorf("failed to write vial mono config: %w", err)
 	}
 	savedFiles = append(savedFiles, vialMonoPath)
@@ -251,7 +251,7 @@ func saveLocalConfigs(outDir string, cfg *discover.DiscoveredConfig) error {
 
 		vialDrawPath := filepath.Join(outDir, "vial_draw.yaml")
 		vialDrawContent := discover.GenerateConfig(&vialDrawCfg)
-		if err := os.WriteFile(vialDrawPath, []byte(vialDrawContent), 0644); err != nil {
+		if err := os.WriteFile(vialDrawPath, []byte(vialDrawContent), 0600); err != nil {
 			return fmt.Errorf("failed to write vial draw config: %w", err)
 		}
 		savedFiles = append(savedFiles, vialDrawPath)

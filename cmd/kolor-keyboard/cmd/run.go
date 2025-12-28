@@ -45,7 +45,7 @@ Device and firmware are auto-detected if not specified in config.`,
 		if err != nil {
 			return fmt.Errorf("failed to initialize app: %w", err)
 		}
-		defer application.Close()
+		defer func() { _ = application.Close() }()
 
 		return application.Run()
 	},

@@ -149,7 +149,7 @@ func installService() error {
 	}
 
 	// Create directory
-	if err := os.MkdirAll(serviceDir, 0755); err != nil {
+	if err := os.MkdirAll(serviceDir, 0750); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
@@ -226,7 +226,7 @@ func uninstallService() error {
 
 func systemctl(args ...string) error {
 	allArgs := append([]string{"--user"}, args...)
-	cmd := exec.Command("systemctl", allArgs...)
+	cmd := exec.Command("systemctl", allArgs...) //nolint:gosec // systemctl is safe
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
@@ -234,7 +234,7 @@ func systemctl(args ...string) error {
 
 func systemctlQuiet(args ...string) error {
 	allArgs := append([]string{"--user"}, args...)
-	cmd := exec.Command("systemctl", allArgs...)
+	cmd := exec.Command("systemctl", allArgs...) //nolint:gosec // systemctl is safe
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%w: %s", err, strings.TrimSpace(string(output)))

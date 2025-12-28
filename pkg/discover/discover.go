@@ -41,7 +41,7 @@ func FindVIADevices() ([]DeviceInfo, error) {
 	if err := hidlib.Init(); err != nil {
 		return nil, fmt.Errorf("failed to init HID: %w", err)
 	}
-	defer hidlib.Exit()
+	defer func() { _ = hidlib.Exit() }()
 
 	var devices []DeviceInfo
 	seen := make(map[string]bool)
@@ -80,7 +80,7 @@ func CheckVialSupport(dev *DeviceInfo) error {
 	if err := device.Open(); err != nil {
 		return fmt.Errorf("cannot open device: %w", err)
 	}
-	defer device.Close()
+	defer func() { _ = device.Close() }()
 
 	// Пробуем получить количество LED через Vial команду
 	ledCount, err := device.GetLEDCount()
@@ -105,7 +105,7 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 	if err := device.Open(); err != nil {
 		return nil, fmt.Errorf("failed to open device: %w", err)
 	}
-	defer device.Close()
+	defer func() { _ = device.Close() }()
 
 	// Включаем Vial Direct режим
 	if err := device.EnableVialDirectMode(); err != nil {
@@ -155,15 +155,15 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 
 	for currentLED < ledCount {
 		// Обновляем дисплей
-		device.EnableVialDirectMode()
-		device.SetLEDs(allOff)
+		_ = device.EnableVialDirectMode()
+		_ = device.SetLEDs(allOff)
 
 		// Показываем уже сохранённые ряды разными оттенками жёлтого
 		for rowIdx, row := range rows {
 			// Оттенки жёлтого: H=20-40 (оранжево-жёлтый спектр)
 			hue := uint8(20 + (rowIdx%5)*4) // 20, 24, 28, 32, 36, циклично
 			for _, idx := range row {
-				device.SetLEDs([]hid.LEDUpdate{
+				_ = device.SetLEDs([]hid.LEDUpdate{
 					{Index: idx, Color: hid.HSVColor{H: hue, S: 255, V: 200}},
 				})
 			}
@@ -171,13 +171,13 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 
 		// Показываем предыдущие LED в текущем ряду зелёным
 		for _, idx := range currentRow {
-			device.SetLEDs([]hid.LEDUpdate{
+			_ = device.SetLEDs([]hid.LEDUpdate{
 				{Index: idx, Color: hid.HSVColor{H: 85, S: 255, V: 255}}, // зелёный
 			})
 		}
 
 		// Текущий LED красным
-		device.SetLEDs([]hid.LEDUpdate{
+		_ = device.SetLEDs([]hid.LEDUpdate{
 			{Index: currentLED, Color: hid.HSVColor{H: 0, S: 255, V: 255}}, // красный
 		})
 
@@ -196,7 +196,7 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 				rows = append(rows, currentRow)
 			}
 			fmt.Println("\nMapping complete!")
-			device.SetLEDs(allOff)
+			_ = device.SetLEDs(allOff)
 			return rows, nil
 
 		case "r":
@@ -244,7 +244,7 @@ func RunLEDMappingTour(dev *DeviceInfo) ([][]int, error) {
 	}
 
 	// Выключаем все LED
-	device.SetLEDs(allOff)
+	_ = device.SetLEDs(allOff)
 
 	fmt.Println("\n✓ All LEDs mapped!")
 	return rows, nil

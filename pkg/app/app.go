@@ -100,7 +100,7 @@ func New(configPath string, logger *slog.Logger) (*App, error) {
 
 		// Пробуем получить количество LED через Vial команду
 		ledCount, err := device.GetLEDCount()
-		device.Close()
+		_ = device.Close()
 
 		if err == nil && ledCount > 0 {
 			cfg.Firmware = config.FirmwareVial
@@ -143,7 +143,7 @@ func (a *App) Run() error {
 	if err := a.device.Open(); err != nil {
 		return fmt.Errorf("failed to open device: %w", err)
 	}
-	defer a.device.Close()
+	defer func() { _ = a.device.Close() }()
 
 	// Инициализация режима в зависимости от конфигурации
 	if err := a.initializeMode(); err != nil {
@@ -156,8 +156,8 @@ func (a *App) Run() error {
 		a.logger.Warn("failed to get initial layout", "error", err)
 	} else {
 		a.logger.Info("current layout", "layout", layout.Layout, "name", layout.Name)
-		if err := a.applyLayout(layout.Layout); err != nil {
-			a.logger.Error("failed to apply initial layout", "error", err)
+		if applyErr := a.applyLayout(layout.Layout); applyErr != nil {
+			a.logger.Error("failed to apply initial layout", "error", applyErr)
 		}
 	}
 
@@ -372,10 +372,10 @@ func (a *App) applyFlagLayout(layout string) error {
 // Close закрывает все ресурсы
 func (a *App) Close() error {
 	if a.watcher != nil {
-		a.watcher.Close()
+		_ = a.watcher.Close()
 	}
 	if a.device != nil {
-		a.device.Close()
+		_ = a.device.Close()
 	}
 	return nil
 }
