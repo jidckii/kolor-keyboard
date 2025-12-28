@@ -196,18 +196,105 @@ color: {hsv: {h: 0, s: 255, v: 255}}
 brightness: 200  # 0-255, яркость подсветки
 ```
 
-### Режим Mono
+### Автоопределение устройства
+
+По умолчанию `device` и `firmware` **не обязательны** — программа автоматически найдёт первую подключённую VIA/Vial клавиатуру и определит тип прошивки:
 
 ```yaml
+# Минимальный конфиг — устройство определится автоматически
+mode: draw
+brightness: 200
+
+keyboard:
+  rows:
+    - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    # ...
+
+draw:
+  - layout: ru
+    stripes:
+      - rows: [0, 1, 2, 3, 4, 5]
+        color: {rgb: {r: 255, g: 0, b: 0}}
+```
+
+### Несколько клавиатур
+
+Если подключено несколько VIA/Vial клавиатур, нужно явно указать `device` для каждой:
+
+```yaml
+# ~/.config/kolor-keyboard/keyboard1.yaml
 device:
   vendor_id: 0x3434
   product_id: 0x0331
-  usage_page: 0xFF60
-  usage: 0x61
 
-firmware: vial  # или stock
+mode: draw
+# ...
+```
+
+```yaml
+# ~/.config/kolor-keyboard/keyboard2.yaml
+device:
+  vendor_id: 0x3434
+  product_id: 0x0320
+
 mode: mono
+# ...
+```
 
+Запуск нескольких экземпляров:
+
+```bash
+# Вручную
+kolor-keyboard run -c ~/.config/kolor-keyboard/keyboard1.yaml &
+kolor-keyboard run -c ~/.config/kolor-keyboard/keyboard2.yaml &
+
+# Или создать отдельные systemd user services
+# ~/.config/systemd/user/kolor-keyboard@.service
+```
+
+Пример шаблона systemd для нескольких клавиатур:
+
+```ini
+# ~/.config/systemd/user/kolor-keyboard@.service
+[Unit]
+Description=Kolor Keyboard - %i
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/home/user/.local/bin/kolor-keyboard run -c /home/user/.config/kolor-keyboard/%i.yaml
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+```
+
+```bash
+# Использование
+systemctl --user enable --now kolor-keyboard@keyboard1
+systemctl --user enable --now kolor-keyboard@keyboard2
+```
+
+### Как узнать VID/PID клавиатуры
+
+```bash
+# Через discover
+kolor-keyboard discover
+
+# Или через lsusb
+lsusb | grep -i keyboard
+
+# Или через системные утилиты
+cat /sys/class/hidraw/hidraw*/device/uevent | grep -E "HID_NAME|HID_ID"
+```
+
+### Режим Mono
+
+```yaml
+# device: опционально, см. раздел "Несколько клавиатур"
+# firmware: опционально, автоопределяется (stock или vial)
+
+mode: mono
 brightness: 200
 
 colors:
