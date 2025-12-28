@@ -1,0 +1,186 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+# GoReleaser v2 configuration
+
+version: 2
+
+project_name: kolor-keyboard
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: kolor-keyboard
+    binary: kolor-keyboard
+    main: ./cmd/kolor-keyboard
+    env:
+      - CGO_ENABLED=1
+      - CC=gcc
+    goos:
+      - linux
+    goarch:
+      - amd64
+      # - arm64  # Uncomment when cross-compilation is set up
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+
+archives:
+  - id: default
+    formats:
+      - tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+    files:
+      - README.md
+      - LICENSE
+      - examples/*
+      - keyboards/**/*
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - '^ci:'
+      - Merge pull request
+      - Merge branch
+  groups:
+    - title: 'New Features'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Bug Fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Other'
+      order: 999
+
+# Linux packages
+nfpms:
+  - id: packages
+    package_name: kolor-keyboard
+    vendor: jidckii
+    homepage: https://github.com/jidckii/kolor-keyboard
+    maintainer: jidckii <jidckii@gmail.com>
+    description: |-
+      RGB keyboard backlight based on keyboard layout.
+      Supports VIA/Vial keyboards with per-key RGB.
+    license: MIT
+    formats:
+      - deb
+      - rpm
+      - archlinux
+    dependencies:
+      - systemd
+    recommends:
+      - hidapi
+    bindir: /usr/bin
+    contents:
+      # Example configs
+      - src: examples/
+        dst: /usr/share/doc/kolor-keyboard/examples/
+        type: tree
+      # Keyboard configs
+      - src: keyboards/
+        dst: /usr/share/doc/kolor-keyboard/keyboards/
+        type: tree
+      # udev rules for HID access
+      - src: scripts/99-kolor-keyboard.rules
+        dst: /usr/lib/udev/rules.d/99-kolor-keyboard.rules
+        type: config
+    scripts:
+      postinstall: scripts/postinstall.sh
+    overrides:
+      deb:
+        dependencies:
+          - systemd
+          - libhidapi-hidraw0
+      rpm:
+        dependencies:
+          - systemd
+          - hidapi
+      archlinux:
+        dependencies:
+          - systemd
+          - hidapi
+
+# AUR package (optional, for Arch Linux)
+aurs:
+  - name: kolor-keyboard-bin
+    homepage: https://github.com/jidckii/kolor-keyboard
+    description: RGB keyboard backlight based on keyboard layout
+    maintainers:
+      - 'jidckii <jidckii@gmail.com>'
+    license: MIT
+    private_key: '{{ .Env.AUR_SSH_PRIVATE_KEY }}'
+    git_url: 'ssh://aur@aur.archlinux.org/kolor-keyboard-bin.git'
+    depends:
+      - hidapi
+      - systemd
+    optdepends:
+      - 'plasma-desktop: for KDE Plasma layout detection'
+    package: |-
+      install -Dm755 kolor-keyboard "${pkgdir}/usr/bin/kolor-keyboard"
+      install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+      install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+      install -dm755 "${pkgdir}/usr/share/doc/${pkgname}/examples"
+      cp -r examples/* "${pkgdir}/usr/share/doc/${pkgname}/examples/"
+    skip_upload: true  # Set to false when AUR is configured
+    commit_author:
+      name: GoReleaser Bot
+      email: bot@goreleaser.com
+
+release:
+  github:
+    owner: jidckii
+    name: kolor-keyboard
+  draft: false
+  prerelease: auto
+  mode: replace
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  header: |
+    ## What's Changed
+
+    RGB keyboard backlight based on keyboard layout for VIA/Vial keyboards.
+  footer: |
+    ---
+
+    **Full Changelog**: https://github.com/jidckii/kolor-keyboard/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+    ## Installation
+
+    ### From package manager
+
+    ```bash
+    # Arch Linux (AUR)
+    yay -S kolor-keyboard-bin
+
+    # Debian/Ubuntu
+    sudo dpkg -i kolor-keyboard_{{.Version}}_linux_amd64.deb
+
+    # Fedora/RHEL
+    sudo rpm -i kolor-keyboard_{{.Version}}_linux_amd64.rpm
+    ```
+
+    ### From binary
+
+    ```bash
+    tar -xzf kolor-keyboard_{{.Version}}_linux_amd64.tar.gz
+    sudo mv kolor-keyboard /usr/local/bin/
+    ```
+
+# Announce (optional)
+# announce:
+#   skip: true

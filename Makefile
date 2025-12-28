@@ -1,4 +1,5 @@
-.PHONY: build install uninstall clean enable disable status test discover coverage-html
+.PHONY: build install uninstall clean enable disable status test discover coverage-html \
+        release release-snapshot lint
 
 BINARY := kolor-keyboard
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
@@ -68,3 +69,24 @@ run: build
 # Discover keyboard and generate config
 discover: build
 	./$(BINARY) discover
+
+# GoReleaser commands
+release-snapshot:
+	goreleaser release --snapshot --clean
+
+release-check:
+	goreleaser check
+
+# Lint
+lint:
+	golangci-lint run ./...
+
+# Create new release tag
+# Usage: make tag VERSION=v1.0.0
+tag:
+ifndef VERSION
+	$(error VERSION is required. Usage: make tag VERSION=v1.0.0)
+endif
+	@echo "Creating tag $(VERSION)..."
+	git tag -a $(VERSION) -m "Release $(VERSION)"
+	@echo "Push with: git push origin $(VERSION)"

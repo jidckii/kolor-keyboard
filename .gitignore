@@ -2,6 +2,7 @@
 
 # Binary
 /kolor-keyboard
+/dist
 
 # IDE
 .idea/

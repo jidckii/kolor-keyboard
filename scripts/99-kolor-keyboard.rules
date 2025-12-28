@@ -1,0 +1,23 @@
+# udev rules for kolor-keyboard
+# Allows non-root access to VIA/Vial compatible keyboards
+
+# VIA/Vial keyboards (Usage Page 0xFF60, Usage 0x61)
+# Generic rule for all VIA/Vial devices
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="*", MODE="0660", TAG+="uaccess"
+
+# Keychron keyboards
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3434", MODE="0660", TAG+="uaccess"
+
+# QMK/VIA keyboards (common vendors)
+# Clueboard
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="c1ed", MODE="0660", TAG+="uaccess"
+# foostan (Corne, etc)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="4653", MODE="0660", TAG+="uaccess"
+# Input Club
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="308f", MODE="0660", TAG+="uaccess"
+# OLKB (Planck, Preonic)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="feed", MODE="0660", TAG+="uaccess"
+# ZSA (Moonlander, Ergodox EZ)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3297", MODE="0660", TAG+="uaccess"
+# Wilba.Tech
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="6582", MODE="0660", TAG+="uaccess"
