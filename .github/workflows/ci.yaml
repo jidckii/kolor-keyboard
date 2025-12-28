@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
+          sudo apt-get update -q
           sudo apt-get install -y libhidapi-dev
 
       - name: Download modules
@@ -56,7 +56,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
+          sudo apt-get update -q
           sudo apt-get install -y libhidapi-dev
 
       - name: Build
@@ -80,7 +80,7 @@ jobs:
           version: latest
           args: --timeout=5m
 
-  goreleaser-check:
+goreleaser-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
