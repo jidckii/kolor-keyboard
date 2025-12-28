@@ -20,3 +20,4 @@ coverage.html
 
 # Local config
 *.local.yaml
+/.env
