@@ -33,16 +33,15 @@ linters:
       - linters:
           - staticcheck
         text: "SA9003:"
-
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-  gosec:
-    excludes:
-      - G104  # Unhandled errors (we handle them consciously)
-  misspell:
-    locale: US
+  settings:
+    errcheck:
+      check-type-assertions: true
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+    gosec:
+      excludes:
+        - G104
+    misspell:
+      locale: US
