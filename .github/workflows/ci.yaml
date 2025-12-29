@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y libhidapi-dev
+          sudo apt-get install -y libhidapi-dev libudev-dev
 
       - name: Download modules
         run: go mod download
@@ -57,7 +57,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y libhidapi-dev
+          sudo apt-get install -y libhidapi-dev libudev-dev
 
       - name: Build
         run: go build -v ./...
