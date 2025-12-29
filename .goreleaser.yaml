@@ -110,7 +110,8 @@ nfpms:
       rpm:
         dependencies:
           - systemd
-          - hidapi
+          # Use shared library dependency - works across Fedora, openSUSE, ALT Linux
+          - libhidapi-hidraw.so.0()(64bit)
       archlinux:
         dependencies:
           - systemd
