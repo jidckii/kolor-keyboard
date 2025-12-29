@@ -85,6 +85,18 @@ jobs:
           version: v2.7.2
           args: --timeout=5m
 
+  shellcheck:
+    runs-on: ubuntu-latest
+    container:
+      image: koalaman/shellcheck-alpine:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run shellcheck
+        run: |
+          find . -name '*.sh' -type f | xargs -r shellcheck
+
   goreleaser-check:
     runs-on: ubuntu-latest
     steps:
