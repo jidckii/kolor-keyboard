@@ -26,7 +26,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libhidapi-dev
+          sudo apt-get install -y libhidapi-dev libudev-dev
           # For ARM64 cross-compilation (uncomment when needed):
           # sudo apt-get install -y gcc-aarch64-linux-gnu libc6-dev-arm64-cross
 
@@ -37,11 +37,9 @@ jobs:
           version: '2.13.2'
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}  # Uncomment for AUR
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
 
       - name: Publish to Codeberg
         run: ./publish.sh
         env:
           CODEBERG_FORGEJO_TOKEN: ${{ secrets.CODEBERG_FORGEJO_TOKEN }}
-          FORGEJO_TOKEN: ${{ secrets.CODEBERG_FORGEJO_TOKEN }}
