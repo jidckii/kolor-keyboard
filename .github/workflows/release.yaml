@@ -37,6 +37,7 @@ jobs:
           version: '2.13.2'
           args: release --clean
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
 
       - name: Publish to Codeberg
