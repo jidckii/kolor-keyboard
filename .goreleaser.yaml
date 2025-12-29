@@ -138,7 +138,7 @@ aurs:
       install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
       install -dm755 "${pkgdir}/usr/share/doc/${pkgname}/examples"
       cp -r examples/* "${pkgdir}/usr/share/doc/${pkgname}/examples/"
-    skip_upload: true  # Set to false when AUR is configured
+    skip_upload: false
     commit_author:
       name: GoReleaser Bot
       email: bot@goreleaser.com
