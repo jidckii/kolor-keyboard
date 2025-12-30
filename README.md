@@ -372,7 +372,46 @@ kolor-keyboard/
 
 ## Установка
 
-### Простая установка
+### Из пакетного менеджера
+
+**Arch Linux (AUR):**
+```bash
+yay -S kolor-keyboard-bin
+```
+
+Или из репозитория Codeberg:
+```bash
+# Добавить репозиторий (один раз)
+echo '[kolor-keyboard]
+Server = https://codeberg.org/api/packages/jidckii/arch/$arch' | sudo tee -a /etc/pacman.conf
+sudo pacman -Sy kolor-keyboard
+```
+
+**Debian/Ubuntu (.deb):**
+```bash
+# Скачать и установить
+curl -LO "https://codeberg.org/api/packages/jidckii/debian/pool/kolor-keyboard/kolor-keyboard_VERSION_amd64.deb"
+sudo dpkg -i kolor-keyboard_VERSION_amd64.deb
+```
+
+Или настроить репозиторий — см. [инструкцию](https://codeberg.org/jidckii/-/packages/debian/kolor-keyboard).
+
+**Fedora/openSUSE/RHEL (.rpm):**
+```bash
+# Скачать и установить
+curl -LO "https://codeberg.org/api/packages/jidckii/rpm/pool/kolor-keyboard-VERSION.x86_64.rpm"
+sudo rpm -i kolor-keyboard-VERSION.x86_64.rpm
+```
+
+Или настроить репозиторий — см. [инструкцию](https://codeberg.org/jidckii/-/packages/rpm/kolor-keyboard).
+
+**ALT Linux:**
+
+См. [инструкцию по установке](https://codeberg.org/jidckii/-/packages/alt/kolor-keyboard).
+
+---
+
+### Из исходников
 
 ```bash
 make install
