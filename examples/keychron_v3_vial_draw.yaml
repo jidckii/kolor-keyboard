@@ -5,7 +5,7 @@
 mode: draw
 
 # Глобальные настройки RGB
-brightness: 128  # 0-255, яркость подсветки
+brightness: 255  # 0-255, яркость подсветки
 
 # Раскладка LED для Keychron V3 ANSI Encoder (87 LEDs)
 # Индексы LED для каждого ряда клавиатуры

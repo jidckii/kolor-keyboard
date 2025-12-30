@@ -19,6 +19,8 @@
 
 ## Поддерживаемые клавиатуры
 
+В теории любые QMK/VIA или Vial, но тестировалось только на следующих.
+
 | Клавиатура | Раскладка | Энкодер | Статус |
 |------------|-----------|---------|--------|
 | Keychron V3 | ANSI | ✅ | Протестировано |
@@ -54,10 +56,12 @@ cd kolor-keyboard
 make build
 ```
 
+Либо установите из пакетов по инструкции ниже.
+
 ### 2. Генерация конфигурации для вашей клавиатуры
 
 ```bash
-./kolor-keyboard discover
+kolor-keyboard discover --global
 ```
 
 Команда `discover` автоматически:
@@ -75,6 +79,12 @@ make build
 # Или скопируйте конфиг в стандартное место
 cp keyboards/keychron/v3/ansi_encoder/vial_draw.yaml ~/.config/kolor-keyboard/config.yaml
 ./kolor-keyboard run
+```
+
+Если вы установили из пакета, то просто создайте сервис
+
+```bash
+kolor-keyboard svc install
 ```
 
 ---
@@ -394,7 +404,7 @@ curl -LO "https://codeberg.org/api/packages/jidckii/debian/pool/kolor-keyboard/k
 sudo dpkg -i kolor-keyboard_VERSION_amd64.deb
 ```
 
-Или настроить репозиторий — см. [инструкцию](https://codeberg.org/jidckii/-/packages/debian/kolor-keyboard).
+Или настроить репозиторий Codeberg — см. [инструкцию](https://codeberg.org/jidckii/-/packages/debian/kolor-keyboard).
 
 **Fedora/openSUSE/RHEL (.rpm):**
 ```bash
@@ -403,26 +413,20 @@ curl -LO "https://codeberg.org/api/packages/jidckii/rpm/pool/kolor-keyboard-VERS
 sudo rpm -i kolor-keyboard-VERSION.x86_64.rpm
 ```
 
-Или настроить репозиторий — см. [инструкцию](https://codeberg.org/jidckii/-/packages/rpm/kolor-keyboard).
+Или настроить репозиторий Codeberg — см. [инструкцию](https://codeberg.org/jidckii/-/packages/rpm/kolor-keyboard).
 
 **ALT Linux:**
 
-См. [инструкцию по установке](https://codeberg.org/jidckii/-/packages/alt/kolor-keyboard).
+```bash
+# Скачать и установить
+curl -LO "https://codeberg.org/api/packages/jidckii/rpm/pool/kolor-keyboard-VERSION.x86_64.rpm"
+sudo rpm -i kolor-keyboard-VERSION.x86_64.rpm
+```
+
+Или настроить репозиторий Codeberg — см. [инструкцию по установке](https://codeberg.org/jidckii/-/packages/alt/kolor-keyboard).
 
 ---
 
-### Из исходников
-
-```bash
-make install
-make enable
-```
-
-Это:
-- Соберёт бинарник
-- Установит в `~/.local/bin/`
-- Скопирует пример конфига в `~/.config/kolor-keyboard/`
-- Установит и запустит systemd user service
 
 ### Ручная установка
 
@@ -434,13 +438,10 @@ make build
 sudo cp kolor-keyboard /usr/local/bin/
 
 # Конфигурация (выберите подходящий конфиг)
-mkdir -p ~/.config/kolor-keyboard
-cp keyboards/keychron/v3/ansi_encoder/vial_draw.yaml ~/.config/kolor-keyboard/config.yaml
+kolor-keyboard discover --global
 
 # Systemd service
-cp scripts/kolor-keyboard.service ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user enable --now kolor-keyboard
+kolor-keyboard svc install
 ```
 
 ### udev правила

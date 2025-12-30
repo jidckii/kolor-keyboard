@@ -37,11 +37,8 @@ coverage-html: test
 # Install udev rules (requires sudo)
 install-udev:
 	@echo "Installing udev rules..."
-	sudo wget -O /etc/udev/rules.d/50-qmk.rules \
-		https://raw.githubusercontent.com/qmk/qmk_firmware/master/util/udev/50-qmk.rules
-	@echo "Adding Keychron V3 rule..."
-	echo 'SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3434", ATTRS{idProduct}=="0331", TAG+="uaccess"' | \
-		sudo tee /etc/udev/rules.d/51-keychron.rules
+	sudo cp scripts/udev/50-qmk.rules /etc/udev/rules.d/50-qmk.rules
+	sudo cp scripts/udev/51-kolor-keyboard.rules /etc/udev/rules.d/51-kolor-keyboard.rules
 	sudo udevadm control --reload-rules
 	sudo udevadm trigger
 	@echo "udev rules installed. You may need to replug the keyboard."
@@ -61,10 +58,6 @@ test-dbus:
 	@echo ""
 	@echo "Layouts list:"
 	qdbus6 org.kde.keyboard /Layouts org.kde.KeyboardLayouts.getLayoutsList
-
-# Run in debug mode
-run: build
-	./$(BINARY) run --debug -c keyboards/keychron/v3/ansi_encoder/vial_draw.yaml
 
 # Discover keyboard and generate config
 discover: build
