@@ -41,7 +41,7 @@ archives:
       - README.md
       - LICENSE
       - examples/*
-      - keyboards/**/*
+      - scripts/udev/*
 
 checksum:
   name_template: 'checksums.txt'
@@ -84,7 +84,6 @@ nfpms:
       - archlinux
     dependencies:
       - systemd
-    recommends:
       - hidapi
     bindir: /usr/bin
     contents:
@@ -92,13 +91,12 @@ nfpms:
       - src: examples/
         dst: /usr/share/doc/kolor-keyboard/examples/
         type: tree
-      # Keyboard configs
-      - src: keyboards/
-        dst: /usr/share/doc/kolor-keyboard/keyboards/
-        type: tree
       # udev rules for HID access
-      - src: scripts/99-kolor-keyboard.rules
-        dst: /usr/lib/udev/rules.d/99-kolor-keyboard.rules
+      - src: scripts/udev/50-qmk.rules
+        dst: /etc/udev/rules.d/50-qmk.rules
+        type: config
+      - src: scripts/udev/51-kolor-keyboard.rules
+        dst: /etc/udev/rules.d/51-kolor-keyboard.rules
         type: config
     scripts:
       postinstall: scripts/postinstall.sh
@@ -128,16 +126,20 @@ aurs:
     private_key: '{{ .Env.AUR_SSH_PRIVATE_KEY }}'
     git_url: 'ssh://aur@aur.archlinux.org/kolor-keyboard-bin.git'
     depends:
-      - hidapi
       - systemd
+      - hidapi
     optdepends:
       - 'plasma-desktop: for KDE Plasma layout detection'
+    install: scripts/kolor-keyboard.install
     package: |-
       install -Dm755 kolor-keyboard "${pkgdir}/usr/bin/kolor-keyboard"
       install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
       install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
       install -dm755 "${pkgdir}/usr/share/doc/${pkgname}/examples"
       cp -r examples/* "${pkgdir}/usr/share/doc/${pkgname}/examples/"
+      # udev rules for HID access
+      install -Dm644 scripts/udev/50-qmk.rules "${pkgdir}/etc/udev/rules.d/50-qmk.rules"
+      install -Dm644 scripts/udev/51-kolor-keyboard.rules "${pkgdir}/etc/udev/rules.d/51-kolor-keyboard.rules"
     skip_upload: false
     commit_author:
       name: GoReleaser Bot
