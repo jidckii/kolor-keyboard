@@ -21,7 +21,7 @@ const (
 
 	// VIA RGB Matrix эффекты (для mono режима)
 	EffectDisable    = 0x00
-	EffectSolidColor = 0x02
+	EffectSolidColor = 0x01
 
 	// Vial RGB эффекты (для draw режима)
 	VialEffectOff    = 0x0000
